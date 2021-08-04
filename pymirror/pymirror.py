@@ -2,8 +2,8 @@
 # coding: utf-8
 
 import argparse
+from glob import glob
 import json
-import logging
 import multiprocessing as mp
 import os
 import platform
@@ -20,33 +20,32 @@ import tarfile
 import time
 import traceback
 from pathlib import Path
+from types import SimpleNamespace
 
 from rich.console import Console
+from loguru import logger
 from selenium import webdriver
 from selenium.common.exceptions import WebDriverException
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.firefox.options import Options
 from webdriver_manager.firefox import GeckoDriverManager
 
+from .config import Config
+
+console = Console()
+
 
 class KeyboardInterruptHandler:
     def __init__(self):
         pass
+
     def keyboardInterruptHandler(*args):
         sys.tracebacklimit = 0
         print('', end='\r')
         time.sleep(0.5)
         console.print('[#f1fa8c]Quitting...')
-        logging.info('Interrupted by the user.')
+        logger.info('Interrupted by the user.')
         sys.exit(0)
-
-
-class Config:
-    PROJECT_PATH = f'{Path(__file__).parent}'
-    UBLOCK = f'{PROJECT_PATH}/ublock_latest.xpi'
-    DATA = f'{PROJECT_PATH}/data/servers_data.json'
-    LOG_FILE = f'{PROJECT_PATH}/pymirror.log'
-    WIN_GECKO = None
 
 
 class CustomHelpFormatter(argparse.HelpFormatter):
@@ -65,38 +64,26 @@ def fmt(prog):
     return CustomHelpFormatter(prog)
 
 
-console = Console()
-
 class PyMirror:
-    def __init__(self, args):
-        self.args = args
+    def __init__(self):
         pass
-
-    def custom_logger(path: str):
-        myformat = '%(asctime)s - %(name)-12s - %(levelname)-8s - %(message)s'
-        # noinspection PyArgumentList
-        logging.basicConfig(level=logging.DEBUG,
-                            format=myformat,
-                            datefmt='%Y-%d-%m %H:%M:%S',
-                            handlers=[logging.FileHandler(path)])
-
 
     def custom_error_traceback(exception: Exception,
                                error_msg: str,
-                               log: bool=False,
-                               verbose: bool=False):
+                               log: bool = False,
+                               verbose: bool = False):
         if log:
-            logging.error(error_msg)
-        tb = traceback.format_exception(None, exception, exception.__traceback__)
+            logger.error(error_msg)
+        tb = traceback.format_exception(None, exception,
+                                        exception.__traceback__)
         if verbose:
             console.print(tb)
         if log:
-            logging.error(f'{"-" * 10} Start of error traceback {"-" * 10}')
+            logger.error(f'{"-" * 10} Start of error traceback {"-" * 10}')
             for ln in tb:
-                logging.error(ln.replace('\n', ''))
-            logging.error(f'{"-" * 10} End of error traceback {"-" * 10}')
+                logger.error(ln.replace('\n', ''))
+            logger.error(f'{"-" * 10} End of error traceback {"-" * 10}')
         return tb
-
 
     def tgz(input_folder: str):
         out_file = f'{Path(input_folder).parent}/{Path(input_folder).name}.tar.gz'
@@ -104,27 +91,22 @@ class PyMirror:
             t.add(input_folder, arcname=Path(input_folder).name)
         return out_file
 
-
     def clean_filename(file: str):
         rfile = ''.join([
-            Path(x).stem.replace(x, "_") if x in string.punctuation + ' ' else x
-            for x in Path(Path(file).stem).stem
+            Path(x).stem.replace(x, "_") if x in string.punctuation +
+            ' ' else x for x in Path(Path(file).stem).stem
         ])
         rfile = f'{rfile}{"".join(Path(file).suffixes)}'
         rfile = f'{Path(file).parent}/{rfile}'
         os.rename(file, rfile)
         return rfile
 
-
     def initializer():
         signal.signal(signal.SIGINT, signal.SIG_IGN)
 
-
     def SeleniumExceptionInfo(exception: Exception):
-        exc_name = sys.exc_info()[0].__name__
-        logging.error(f'Selenium encountered an error: {exc_name}')
-        PyMirror.custom_error_traceback(exception, '!!! Selenium ERROR')
-
+        tb = traceback.format_exception(None, exception, exception.__traceback__)
+        logger.error(f'Selenium encountered an error: {tb}')
 
     def return_ips(data: dict):
         ips = []
@@ -137,7 +119,6 @@ class PyMirror:
             ips.append((ip, k))
         return ips
 
-
     def ping(ip: str):
         if platform.system() == 'Windows':
             response = os.system(f'ping -n 1 {ip[0]} > /dev/null 2>&1')
@@ -145,15 +126,16 @@ class PyMirror:
             response = os.system(f'ping -c 1 {ip[0]} > /dev/null 2>&1')
         if response in [0, 256, 512]:
             console.print(
-                f'[[#50fa7b]OK[/#50fa7b]] [#8be9fd]{ip[1]}[/#8be9fd] is online!')
-            logging.info(f'{ip[1]} is online!')
+                f'[[#50fa7b]OK[/#50fa7b]] [#8be9fd]{ip[1]}[/#8be9fd] is online!'
+            )
+            logger.info(f'{ip[1]} is online!')
             return True
         else:
             console.print(
-                f'[[#ff5555]ERROR![/#ff5555]] [#8be9fd]{ip[1]}[/#8be9fd] is down!')
-            logging.warning(f'{ip[1]} is offline!')
+                f'[[#ff5555]ERROR![/#ff5555]] [#8be9fd]{ip[1]}[/#8be9fd] is down!'
+            )
+            logger.warning(f'{ip[1]} is offline!')
             return False
-
 
     def curl(data: dict, server: str, file: str):
         srv = data[server]['server']
@@ -182,7 +164,6 @@ class PyMirror:
 
         return link
 
-
     def api_uploads(args, data: dict, responses: list, rfile: str):
         links_raw = []
         times = []
@@ -201,29 +182,26 @@ class PyMirror:
                 if 'Bad Gateway' in link:
                     raise Exception
                 console.print('[[#50fa7b]OK[/#50fa7b]]', link)
-                logging.info(f'[OK] {link}')
+                logger.info(f'[OK] {link}')
                 links_raw.append(link)
                 times.append(time.time() - start)
             except ZeroDivisionError:
                 if args.verbose is True:
                     console.print(
-                        f'[[#ff5555]ERROR![/#ff5555]] {k} Timed out! Skipping...')
+                        f'[[#ff5555]ERROR![/#ff5555]] {k} Timed out! Skipping...'
+                    )
                 if args.log:
-                    logging.error(f'{k} Timed out!')
+                    logger.error(f'{k} Timed out!')
             except Exception as e:
                 if args.verbose is True:
                     error_class = sys.exc_info()[0].__name__
-                    console.print(
-                        f'[[#ff5555]ERROR![/#ff5555]] Error in {k}:'
-                        f' {error_class}. Skipping...'
-                    )
-                    PyMirror.custom_error_traceback(e,
-                                       f'[ERROR!] Error in {k}...',
-                                       log=args.log)
+                    console.print(f'[[#ff5555]ERROR![/#ff5555]] Error in {k}:'
+                                  f' {error_class}. Skipping...')
+                    PyMirror.custom_error_traceback(
+                        e, f'[ERROR!] Error in {k}...', log=args.log)
             signal.alarm(0)
 
         return links_raw
-
 
     def match_links(links_raw: list):
         regex = re.compile(
@@ -241,29 +219,20 @@ class PyMirror:
                 links.append(link)
         return links
 
-
     def download_ublock():
         latest = 'https://addons.mozilla.org/firefox/downloads/file/3806442'
-        os.popen(
-            f'curl -sLo {Config.PROJECT_PATH}/ublock_latest.xpi {latest}').read()
-        file_path = f'{Config.PROJECT_PATH}/config.py'
-        with open(file_path, 'r+') as f:
-            lines = f.readlines().copy()
-            with open(file_path, 'w') as fw:
-                for line in lines:
-                    fw.write(line.replace('_.xpi', 'ublock_latest.xpi'))
-
+        out = os.popen(f'curl -sLo {Config.PROJECT_PATH}/ublock_latest.xpi {latest}'
+                 ).read()
+        console.print('\nYou\'re running the "--mirroredto" flag '
+            'for the first time. Please wait until everything is ready. '
+            'This is a one-time thing.\n', style='#f1fa8c')
+        time.sleep(10)
 
     def mirroredto(file: str):
-        if not shutil.which('firefox'):
-            console.print('[[#ff5555]CRITICAL![/#ff5555]] Cannot find Firefox!')
-            console.print(
-                'Install Firefox first: https://www.mozilla.org/en-US/firefox/all')
-            sys.exit(1)
-
-        if Path(Config.UBLOCK).name == '_.xpi':
+        check_ublock = [x for x in glob(Config.PROJECT_PATH) if Path(x).name == 'ublock_latest.xpi']
+        if not check_ublock:
             PyMirror.download_ublock()
-            time.sleep(5)
+            
 
         first_batch = [
             'GoFileIo', 'TusFiles', 'OneFichier', 'ZippyShare', 'UsersDrive',
@@ -281,16 +250,18 @@ class PyMirror:
         options.headless = True
 
         try:
-            if platform.system() == 'Windows':
-                driver = webdriver.Firefox(executable_path=Config.WIN_GECKO,
-                                           options=options,
-                                           service_log_path=os.path.devnull)
-            else:
-                driver = webdriver.Firefox(options=options,
-                                           service_log_path=os.path.devnull)
-        except Exception:
-            driver = webdriver.Firefox(executable_path=GeckoDriverManager().install())
-            
+            driver = webdriver.Firefox(options=options,
+                                       service_log_path=os.path.devnull)
+        except WebDriverException:
+            os.environ['WDM_LOG_LEVEL'] = '0'
+            os.environ['WDM_PRINT_FIRST_LINE'] = 'False'
+            os.environ['WDM_LOCAL'] = '1'
+            driver = webdriver.Firefox(
+                executable_path=GeckoDriverManager().install(), options=options, service_log_path=os.path.devnull)
+        except Exception as e:
+            SeleniumExceptionInfo(e)
+            sys.exit(1)
+
         driver.install_addon(Config.UBLOCK, temporary=True)
 
         for ls in [first_batch, second_batch]:
@@ -305,6 +276,7 @@ class PyMirror:
                         driver.find_element_by_id(x.lower()).click()
                     except Exception as e:
                         PyMirror.SeleniumExceptionInfo(e)
+                        sys.exit(1)
 
                 time.sleep(2)
                 driver.find_element_by_css_selector(
@@ -332,8 +304,8 @@ class PyMirror:
                 while True:
                     time.sleep(5)
                     status = [
-                        x.text
-                        for x in driver.find_elements_by_class_name('id_Success')
+                        x.text for x in driver.find_elements_by_class_name(
+                            'id_Success')
                     ]
                     if len(status) >= 8 or time.time() - start > 60:
                         break
@@ -348,10 +320,11 @@ class PyMirror:
                 for handle in driver.window_handles:
                     driver.switch_to.window(handle)
                     try:
-                        LINK = driver.find_element_by_class_name('code_wrap').text
+                        LINK = driver.find_element_by_class_name(
+                            'code_wrap').text
                         URLs.append(LINK)
                         console.print(f'[[#50fa7b]OK[/#50fa7b]] {LINK}')
-                        logging.info(f'[OK] {LINK}')
+                        logger.info(f'[OK] {LINK}')
                         if handle != current_window:
                             driver.close()
                     except:
@@ -367,7 +340,6 @@ class PyMirror:
 
         driver.quit()
         return URLs
-
 
     def style_output(args, links: list, data: dict):
         style = args.style
@@ -385,15 +357,17 @@ class PyMirror:
             output = '\n'.join(links)
         return output
 
-
     def uploader(self, args):
-        signal.signal(signal.SIGINT, KeyboardInterruptHandler.keyboardInterruptHandler)
+        signal.signal(signal.SIGINT,
+                      KeyboardInterruptHandler.keyboardInterruptHandler)
 
         with open(Config.DATA) as j:
             data = json.load(j)
 
         if args.log:
-            custom_logger(Config.LOG_FILE)
+            logger.remove()
+            logger.add(Config.LOG_FILE, level='DEBUG')
+            logger.add(sys.stderr, level='ERROR')
 
         if args.mirroredto is True:
             data['mirroredto'] = {'server': 'https://mirrored.to'}
@@ -443,62 +417,5 @@ class PyMirror:
         console.rule('Results')
         print(output)
         for x in links:
-            logging.info(x)
+            logger.info(x)
         console.rule('END')
-
-
-# def main():
-
-#     parser = argparse.ArgumentParser(prog ='pymirror', formatter_class=fmt, add_help=False)
-#     parser.add_argument('-h',
-#                         '--help',
-#                         action='help',
-#                         default=argparse.SUPPRESS,
-#                         help='Show this help message and exit')
-#     parser.add_argument('-i',
-#                         '--input',
-#                         help='Path to the input file/folder')
-#     parser.add_argument('-s',
-#                         '--style',
-#                         help='Output style (default: lines)',
-#                         choices=['lines', 'list', 'markdown', 'reddit'],
-#                         default='lines')
-#     parser.add_argument(
-#         '-m',
-#         '--mirroredto',
-#         help='Use mirrored.to to generate more likes (default: False)',
-#         action='store_true',
-#         default=False)
-#     parser.add_argument(
-#         '-n',
-#         '--number',
-#         help='Select a specific number of servers to use (default: max)',
-#         type=int,
-#         default=None)
-#     parser.add_argument(
-#         '-d',
-#         '--delete',
-#         help='Delete the file after the process is complete (default: False)',
-#         action='store_true',
-#         default=False)
-#     parser.add_argument(
-#         '-c',
-#         '--check-status',
-#         help='Check the status of the remote servers (default: False)',
-#         action='store_false',
-#         default=False)
-#     parser.add_argument(
-#         '-l',
-#         '--log',
-#         help='Log the current uploadto a file (default: False)',
-#         action='store_true',
-#         default=False)
-#     parser.add_argument('-v',
-#                         '--verbose',
-#                         help='Make the process more talkative',
-#                         action='store_true',
-#                         default=False)
-
-#     args = parser.parse_args()
-
-#     PyMirror.pymirror(args)

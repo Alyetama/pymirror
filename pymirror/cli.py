@@ -1,10 +1,7 @@
-from types import SimpleNamespace
 import argparse
 
 import pymirror
 
-
-# args = SimpleNamespace(log=False, mirroredto=False, check_status=False, input='/Users/Felis.catus/Desktop/NXuAuLFJ.py', number=1, style='reddit', delete=False, verbose=False)
 
 class CustomHelpFormatter(argparse.HelpFormatter):
     def __init__(self, prog):
@@ -22,17 +19,17 @@ def fmt(prog):
     return CustomHelpFormatter(prog)
 
 
-def main():
+def main(**kwargs):
 
-    parser = argparse.ArgumentParser(prog ='pymirror', formatter_class=fmt, add_help=False)
+    parser = argparse.ArgumentParser(prog='pymirror',
+                                     formatter_class=fmt,
+                                     add_help=False)
     parser.add_argument('-h',
                         '--help',
                         action='help',
                         default=argparse.SUPPRESS,
                         help='Show this help message and exit')
-    parser.add_argument('-i',
-                        '--input',
-                        help='Path to the input file/folder')
+    parser.add_argument('-i', '--input', help='Path to the input file/folder')
     parser.add_argument('-s',
                         '--style',
                         help='Output style (default: lines)',
@@ -76,7 +73,7 @@ def main():
 
     args = parser.parse_args()
 
-    mirror = pymirror.PyMirror(args).uploader(args)
+    mirror = pymirror.PyMirror().uploader(args)
 
 
 if __name__ == '__main__':
