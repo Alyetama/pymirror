@@ -1,0 +1,119 @@
+{
+    "fileio":
+    {
+        "server": "https://file.io",
+        "keys":
+        [
+            "link"
+        ],
+        "flags": "-sF",
+        "parameter": "file=@"
+    },
+    "gofile":
+    {
+        "server": "https://srv-store2.gofile.io/uploadFile",
+        "keys":
+        [
+            "data",
+            "downloadPage"
+        ],
+        "flags": "-sF",
+        "parameter": "file=@"
+    },
+    "uguu":
+    {
+        "server": "https://uguu.se/upload.php",
+        "keys":
+        [
+            "files",
+            0,
+            "url"
+        ],
+        "flags": "-sF",
+        "parameter": "files[]=@"
+    },
+    "transfersh":
+    {
+        "server": "https://transfer.sh",
+        "keys":
+        [],
+        "flags": "-sF",
+        "parameter": "file=@"
+    },
+    "oshi":
+    {
+        "server": "https://oshi.at",
+        "keys":
+        [],
+        "flags": "-sF",
+        "parameter": "files[]=@"
+    },
+    "0x0":
+    {
+        "server": "https://0x0.st",
+        "keys":
+        [],
+        "flags": "-sF",
+        "parameter": "file=@"
+    },
+    "ttm":
+    {
+        "server": "https://ttm.sh",
+        "keys":
+        [],
+        "flags": "-sF",
+        "parameter": "file=@"
+    },
+    "filepush":
+    {
+        "server": "https://filepush.co/upload/",
+        "keys":
+        [],
+        "flags": "-s --upload-file",
+        "parameter": ""
+    },
+    "tempsh":
+    {
+        "server": "https://temp.sh",
+        "keys":
+        [],
+        "flags": "-sT",
+        "parameter": ""
+    },
+    "fileditch":
+    {
+        "server": "https://up1.fileditch.com/upload.php",
+        "keys":
+        [
+            "files",
+            0,
+            "url"
+        ],
+        "flags": "-sF",
+        "parameter": "files[]=@"
+    },
+    "pomflainla":
+    {
+        "server": "https://pomf.lain.la/upload.php",
+        "keys":
+        [
+            "files",
+            0,
+            "url"
+        ],
+        "flags": "-sF",
+        "parameter": "files[]=@"
+    },
+    "midi":
+    {
+        "server": "https://midi.moe/upload.php",
+        "keys":
+        [
+            "files",
+            0,
+            "url"
+        ],
+        "flags": "-sF",
+        "parameter": "files[]=@"
+    }
+}
