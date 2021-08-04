@@ -8,7 +8,7 @@ long_description = 'Upload files to multiple free hosting servers'
   
 setup(
         name ='pymirror',
-        version ='0.1.0',
+        version ='0.1.6',
         author ='Alyetama',
         url ='https://github.com/Alyetama/pymirror',
         description ='Upload files to multiple free hosting servers',

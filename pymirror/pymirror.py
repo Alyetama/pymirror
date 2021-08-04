@@ -49,11 +49,6 @@ class CustomHelpFormatter(argparse.HelpFormatter):
         return ', '.join(action.option_strings) + ' ' + args_string
 
 
-def symlink():
-    if not shutil.which('pymirror'):
-        script = f'{os.path.dirname(__file__)}/pymirror.py'
-        os.symlink(script, '/usr/local/bin/pymirror')
-
 def custom_logger(path: str):
     myformat = '%(asctime)s - %(name)-12s - %(levelname)-8s - %(message)s'
     # noinspection PyArgumentList
@@ -378,15 +373,8 @@ def style_output(args, links: list, data: dict):
 
 
 def pymirror(*args):
-    def fmt(prog):
-        return CustomHelpFormatter(prog)
-
     signal.signal(signal.SIGINT, keyboardInterruptHandler)
     console = Console()
-
-    if args.symlink:
-        symlink()
-        return
 
     with open(Config.DATA) as j:
         data = json.load(j)
@@ -447,6 +435,8 @@ def pymirror(*args):
 
 
 def main():
+    def fmt(prog):
+        return CustomHelpFormatter(prog)
     parser = argparse.ArgumentParser(prog ='pymirror', formatter_class=fmt, add_help=False)
     parser.add_argument('-h',
                         '--help',
@@ -489,10 +479,6 @@ def main():
     parser.add_argument('-v',
                         '--verbose',
                         help='Make the process more talkative',
-                        action='store_true')
-    parser.add_argument('-k',
-                        '--symlink',
-                        help='Make a symlink to mirror in /usr/local/bin',
                         action='store_true')
 
     args = parser.parse_args()
