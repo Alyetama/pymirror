@@ -65,11 +65,6 @@ def main(**kwargs):
         help='Log the current uploadto a file (default: False)',
         action='store_true',
         default=False)
-    parser.add_argument('-v',
-                        '--verbose',
-                        help='Make the process more talkative',
-                        action='store_true',
-                        default=False)
 
     args = parser.parse_args()
 

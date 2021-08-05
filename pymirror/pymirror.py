@@ -33,6 +33,9 @@ from webdriver_manager.firefox import GeckoDriverManager
 from .config import Config
 
 console = Console()
+logger.remove()
+
+all_links = []
 
 
 class KeyboardInterruptHandler:
@@ -70,14 +73,11 @@ class PyMirror:
 
     def custom_error_traceback(exception: Exception,
                                error_msg: str,
-                               log: bool = False,
-                               verbose: bool = False):
+                               log: bool = False):
         if log:
             logger.error(error_msg)
         tb = traceback.format_exception(None, exception,
                                         exception.__traceback__)
-        if verbose:
-            console.print(tb)
         if log:
             logger.error(f'{"-" * 10} Start of error traceback {"-" * 10}')
             for ln in tb:
@@ -105,7 +105,8 @@ class PyMirror:
         signal.signal(signal.SIGINT, signal.SIG_IGN)
 
     def SeleniumExceptionInfo(exception: Exception):
-        tb = traceback.format_exception(None, exception, exception.__traceback__)
+        tb = traceback.format_exception(None, exception,
+                                        exception.__traceback__)
         logger.error(f'Selenium encountered an error: {tb}')
 
     def return_ips(data: dict):
@@ -126,13 +127,13 @@ class PyMirror:
             response = os.system(f'ping -c 1 {ip[0]} > /dev/null 2>&1')
         if response in [0, 256, 512]:
             console.print(
-                f'[[#50fa7b]OK[/#50fa7b]] [#8be9fd]{ip[1]}[/#8be9fd] is online!'
+                f'[[#50fa7b] OK [/#50fa7b]] [#8be9fd]{ip[1]}[/#8be9fd] is online!'
             )
             logger.info(f'{ip[1]} is online!')
             return True
         else:
             console.print(
-                f'[[#ff5555]ERROR![/#ff5555]] [#8be9fd]{ip[1]}[/#8be9fd] is down!'
+                f'[[#ff5555] ERROR! [/#ff5555]] [#8be9fd]{ip[1]}[/#8be9fd] is down!'
             )
             logger.warning(f'{ip[1]} is offline!')
             return False
@@ -165,7 +166,6 @@ class PyMirror:
         return link
 
     def api_uploads(args, data: dict, responses: list, rfile: str):
-        links_raw = []
         times = []
         for n, ((k, _), res) in enumerate(zip(data.items(), responses)):
             if args.number:
@@ -179,29 +179,22 @@ class PyMirror:
                 if len(times) > 2:
                     signal.alarm(int(statistics.mean(times)) + 5)
                 link = PyMirror.curl(data, k, rfile)
-                if 'Bad Gateway' in link:
+                if 'bad gateway' in link.lower() or 'error' in link.lower():
                     raise Exception
-                console.print('[[#50fa7b]OK[/#50fa7b]]', link)
-                logger.info(f'[OK] {link}')
-                links_raw.append(link)
+                console.print('[[#50fa7b] OK [/#50fa7b]]', link)
+                all_links.append(link)
+                logger.info(f'[ OK ] {link}')
                 times.append(time.time() - start)
             except ZeroDivisionError:
-                if args.verbose is True:
-                    console.print(
-                        f'[[#ff5555]ERROR![/#ff5555]] {k} Timed out! Skipping...'
-                    )
                 if args.log:
                     logger.error(f'{k} Timed out!')
             except Exception as e:
-                if args.verbose is True:
-                    error_class = sys.exc_info()[0].__name__
-                    console.print(f'[[#ff5555]ERROR![/#ff5555]] Error in {k}:'
-                                  f' {error_class}. Skipping...')
-                    PyMirror.custom_error_traceback(
-                        e, f'[ERROR!] Error in {k}...', log=args.log)
-            signal.alarm(0)
-
-        return links_raw
+                error_class = sys.exc_info()[0].__name__
+                PyMirror.custom_error_traceback(e,
+                                                f'[ ERROR! ] Error in {k}...',
+                                                log=args.log)
+            finally:
+                signal.alarm(0)
 
     def match_links(links_raw: list):
         regex = re.compile(
@@ -221,18 +214,45 @@ class PyMirror:
 
     def download_ublock():
         latest = 'https://addons.mozilla.org/firefox/downloads/file/3806442'
-        out = os.popen(f'curl -sLo {Config.PROJECT_PATH}/ublock_latest.xpi {latest}'
-                 ).read()
-        console.print('\nYou\'re running the "--mirroredto" flag '
+        out = os.popen(
+            f'curl -sLo {Config.PROJECT_PATH}/ublock_latest.xpi {latest}'
+        ).read()
+        console.print(
+            '\nYou\'re running the "--mirroredto" flag '
             'for the first time. Please wait until everything is ready. '
-            'This is a one-time thing.\n', style='#f1fa8c')
-        time.sleep(10)
+            'This is a one-time thing.\n',
+            style='#f1fa8c')
+        time.sleep(5)
 
     def mirroredto(file: str):
-        check_ublock = [x for x in glob(Config.PROJECT_PATH) if Path(x).name == 'ublock_latest.xpi']
+        def start_driver():
+            options = Options()
+            options.headless = True
+            try:
+                driver = webdriver.Firefox(options=options,
+                                           service_log_path=os.path.devnull)
+                driver.install_addon(Config.UBLOCK, temporary=True)
+                return driver
+            except WebDriverException:
+                os.environ['WDM_LOG_LEVEL'] = '0'
+                os.environ['WDM_PRINT_FIRST_LINE'] = 'False'
+                os.environ['WDM_LOCAL'] = '1'
+                driver = webdriver.Firefox(
+                    executable_path=GeckoDriverManager().install(),
+                    options=options,
+                    service_log_path=os.path.devnull)
+                driver.install_addon(Config.UBLOCK, temporary=True)
+                return driver
+            except Exception as e:
+                SeleniumExceptionInfo(e)
+                sys.exit(1)
+
+        check_ublock = [
+            x for x in glob(f'{Config.PROJECT_PATH}/*')
+            if Path(x).name == 'ublock_latest.xpi'
+        ]
         if not check_ublock:
             PyMirror.download_ublock()
-            
 
         first_batch = [
             'GoFileIo', 'TusFiles', 'OneFichier', 'ZippyShare', 'UsersDrive',
@@ -241,31 +261,14 @@ class PyMirror:
         second_batch = [
             'GoFileIo', 'DownloadGG', 'TurboBit', 'Uptobox', 'SolidFiles',
             'DailyUploads', 'UploadEe', 'DropApk', 'MixdropCo', 'FilesIm',
-            'MegaupNet', 'dlupload', 'file-upload', 'catboxmoe'
+            'MegaupNet', 'dlupload', 'file-upload'
         ]
 
-        URLs = []
-
-        options = Options()
-        options.headless = True
-
-        try:
-            driver = webdriver.Firefox(options=options,
-                                       service_log_path=os.path.devnull)
-        except WebDriverException:
-            os.environ['WDM_LOG_LEVEL'] = '0'
-            os.environ['WDM_PRINT_FIRST_LINE'] = 'False'
-            os.environ['WDM_LOCAL'] = '1'
-            driver = webdriver.Firefox(
-                executable_path=GeckoDriverManager().install(), options=options, service_log_path=os.path.devnull)
-        except Exception as e:
-            SeleniumExceptionInfo(e)
-            sys.exit(1)
-
-        driver.install_addon(Config.UBLOCK, temporary=True)
+        driver = start_driver()
 
         for ls in [first_batch, second_batch]:
             try:
+                time.sleep(2)
                 driver.get('https://www.mirrored.to/')
                 time.sleep(5)
                 html = driver.find_element_by_tag_name('html')
@@ -276,13 +279,14 @@ class PyMirror:
                         driver.find_element_by_id(x.lower()).click()
                     except Exception as e:
                         PyMirror.SeleniumExceptionInfo(e)
-                        sys.exit(1)
+                        continue
 
                 time.sleep(2)
+                send_file = lambda selector: driver.find_element_by_css_selector(
+                    selector).send_keys(file)
                 driver.find_element_by_css_selector(
                     '#uploadifive-html_file_upload > input[type=file]:nth-child(3)'
                 ).send_keys(file)
-
                 time.sleep(1)
 
                 driver.find_element_by_id('upload_button').click()
@@ -322,9 +326,9 @@ class PyMirror:
                     try:
                         LINK = driver.find_element_by_class_name(
                             'code_wrap').text
-                        URLs.append(LINK)
-                        console.print(f'[[#50fa7b]OK[/#50fa7b]] {LINK}')
-                        logger.info(f'[OK] {LINK}')
+                        all_links.append(LINK)
+                        console.print(f'[[#50fa7b] OK [/#50fa7b]] {LINK}')
+                        logger.info(f'[ OK ] {LINK}')
                         if handle != current_window:
                             driver.close()
                     except:
@@ -339,17 +343,16 @@ class PyMirror:
                 break
 
         driver.quit()
-        return URLs
 
-    def style_output(args, links: list, data: dict):
+    def style_output(args, LINKs: dict):
+        names = list(LINKs.keys())
+        links = list(LINKs.values())
         style = args.style
         if style == 'list':
             output = '\n'.join(links)
         elif style == 'markdown':
-            output = '\n'.join([
-                f'- [{name}]({link})'
-                for name, link in zip([k for k, _ in data.items()], links)
-            ])
+            output = '\n'.join(
+                [f'- [{name}]({link})' for name, link in zip(names, links)])
         elif style == 'reddit':
             output = ' | '.join(
                 [f'[Mirror {n + 1}]({link})' for n, link in enumerate(links)])
@@ -395,17 +398,26 @@ class PyMirror:
             responses = [True] * len(data.keys())
 
         links_raw = PyMirror.api_uploads(args, data, responses, rfile)
-        links = PyMirror.match_links(links_raw)
+        # links = PyMirror.match_links(links_raw)
 
         if args.mirroredto is True:
             try:
                 urls = PyMirror.mirroredto(str(Path(rfile).resolve()))
             except WebDriverException as e:
                 PyMirror.SeleniumExceptionInfo(e)
-                urls = []
-            links = links + urls
 
-        output = PyMirror.style_output(args, links, data)
+        LINKs = {}
+
+        for link in all_links:
+            domain = link.split('/')[:-1][2].replace('www.', '')
+            name = '.'.join(domain.split('.')[0:])
+            if len(name) == 1:
+                name = '.'.join(domain.split('.')[1:])
+            elif len(name.split('.')) == 3:
+                name = '.'.join(domain.split('.')[1:])
+            LINKs.update({name: link})
+
+        output = PyMirror.style_output(args, LINKs)
 
         if args.delete:
             if Path(args.input).is_dir():
@@ -416,6 +428,7 @@ class PyMirror:
             os.remove(file)
         console.rule('Results')
         print(output)
-        for x in links:
+        os.rename(rfile, file)
+        for x in all_links:
             logger.info(x)
         console.rule('END')
