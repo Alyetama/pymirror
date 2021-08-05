@@ -39,7 +39,7 @@ $ pymirror --input foo.txt
 ## Examaples
 1. Upload a file to multiple free hosting services and return the output in a markdown style
 ```bash
-0:43:28 | ~/Desktop  | $ pymirror --input foo.txt --style markdown
+0:00:00 | ~/Desktop  | $ pymirror --input foo.txt --style markdown
 Press `CTRL+C` at any time to quit.
 ───────────────────────────────── Uploading... ─────────────────────────────────
 [ OK ] https://file.io/PYovv2JI0I4d
@@ -69,7 +69,7 @@ Press `CTRL+C` at any time to quit.
 
 2. Use the `--mirroredto` (`-m`) flag<sup>1</sup> to upload to more hosting services (~ 20 more) utilizing Selenium<sup>2</sup>
 ```bash
-1:50:36 | ~/Desktop  | $ pymirror --input foo.txt --style markdown --mirroredto
+0:00:00 | ~/Desktop  | $ pymirror --input foo.txt --style markdown --mirroredto
 Press `CTRL+C` at any time to quit.
 ───────────────────────────────── Uploading... ─────────────────────────────────
 [ OK ] https://file.io/eDZG6VfnDN43
@@ -133,7 +133,7 @@ Press `CTRL+C` at any time to quit.
 - [megaup.net](https://megaup.net/Ydcb)
 ───────────────────────────────────── END ──────────────────────────────────────
 ```
-<sup>1</sup>Requires Firefox
+<sup>1</sup>Requires Firefox<br>
 <sup>2</sup>Gecko driver will installed automatically if it does not already exist
 
 ## To do
