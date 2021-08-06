@@ -5,6 +5,10 @@ Icon?
 *.log
 *.xpi
 /.idea/
+*/.wdm/
+/pymirror/experimental/
+foo.txt
+test_*
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

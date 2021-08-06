@@ -37,7 +37,7 @@ def main(**kwargs):
                         default='lines')
     parser.add_argument(
         '-m',
-        '--mirroredto',
+        '--more-links',
         help='Use mirrored.to to generate more likes (default: False)',
         action='store_true',
         default=False)

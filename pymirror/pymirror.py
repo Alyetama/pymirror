@@ -2,6 +2,7 @@
 # coding: utf-8
 
 import argparse
+import concurrent.futures
 from glob import glob
 import json
 import multiprocessing as mp
@@ -20,7 +21,6 @@ import tarfile
 import time
 import traceback
 from pathlib import Path
-from types import SimpleNamespace
 
 from rich.console import Console
 from loguru import logger
@@ -30,7 +30,10 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.firefox.options import Options
 from webdriver_manager.firefox import GeckoDriverManager
 
-from .config import Config
+try:
+    from .config import Config
+except ImportError:
+    from config import Config  # For debugging
 
 console = Console()
 logger.remove()
@@ -171,7 +174,7 @@ class PyMirror:
             if args.number:
                 if n == args.number:
                     break
-            if res is False or k == 'mirroredto':
+            if res is False:
                 continue
             try:
                 signal.signal(signal.SIGALRM, lambda x, y: 1 / 0)
@@ -218,41 +221,167 @@ class PyMirror:
             f'curl -sLo {Config.PROJECT_PATH}/ublock_latest.xpi {latest}'
         ).read()
         console.print(
-            '\nYou\'re running the "--mirroredto" flag '
+            '\nYou\'re running the "--more-links" flag '
             'for the first time. Please wait until everything is ready. '
             'This is a one-time thing.\n',
             style='#f1fa8c')
-        time.sleep(5)
 
-    def mirroredto(file: str):
-        def start_driver():
-            options = Options()
-            options.headless = True
-            try:
-                driver = webdriver.Firefox(options=options,
-                                           service_log_path=os.path.devnull)
-                driver.install_addon(Config.UBLOCK, temporary=True)
-                return driver
-            except WebDriverException:
-                os.environ['WDM_LOG_LEVEL'] = '0'
-                os.environ['WDM_PRINT_FIRST_LINE'] = 'False'
-                os.environ['WDM_LOCAL'] = '1'
-                driver = webdriver.Firefox(
-                    executable_path=GeckoDriverManager().install(),
-                    options=options,
-                    service_log_path=os.path.devnull)
-                driver.install_addon(Config.UBLOCK, temporary=True)
-                return driver
-            except Exception as e:
-                SeleniumExceptionInfo(e)
-                sys.exit(1)
-
+    def start_driver():
         check_ublock = [
             x for x in glob(f'{Config.PROJECT_PATH}/*')
             if Path(x).name == 'ublock_latest.xpi'
         ]
         if not check_ublock:
             PyMirror.download_ublock()
+
+        options = Options()
+        options.headless = True
+        try:
+            driver = webdriver.Firefox(options=options,
+                                       service_log_path=os.path.devnull)
+            driver.install_addon(Config.UBLOCK, temporary=True)
+            return driver
+        except WebDriverException:
+            os.environ['WDM_LOG_LEVEL'] = '0'
+            os.environ['WDM_PRINT_FIRST_LINE'] = 'False'
+            os.environ['WDM_LOCAL'] = '1'
+            driver = webdriver.Firefox(
+                executable_path=GeckoDriverManager().install(),
+                options=options,
+                service_log_path=os.path.devnull)
+            driver.install_addon(Config.UBLOCK, temporary=True)
+            return driver
+
+        except Exception as e:
+            SeleniumExceptionInfo(e)
+            console.print('[#ff5555]Something is wrong with Selenium!  Try again or remove the `--more-links` flag')
+
+    def more_links(file: str):
+        def mirror_services(driver, batch):
+            def mirroredto(driver, batch):
+                try:
+                    time.sleep(2)
+                    driver.get('https://www.mirrored.to/')
+                    time.sleep(5)
+                    html = driver.find_element_by_tag_name('html')
+                    _ = [html.send_keys(Keys.ARROW_DOWN) for _ in range(3)]
+
+                    for x in batch:
+                        try:
+                            driver.find_element_by_id(x.lower()).click()
+                        except Exception as e:
+                            PyMirror.SeleniumExceptionInfo(e)
+                            continue
+
+                    time.sleep(2)
+                    send_file = lambda selector: driver.find_element_by_css_selector(
+                        selector).send_keys(file)
+                    driver.find_element_by_css_selector(
+                        '#uploadifive-html_file_upload > input[type=file]:nth-child(3)'
+                    ).send_keys(file)
+                    time.sleep(1)
+
+                    driver.find_element_by_id('upload_button').click()
+                    time.sleep(5)
+
+                    while True:
+                        if driver.current_url != 'https://www.mirrored.to/':
+                            time.sleep(1)
+                            break
+
+                    link = driver.find_element_by_class_name('mlink').text
+                    driver.get(link)
+                    time.sleep(2)
+                    driver.find_element_by_class_name('secondary').click()
+                    time.sleep(2)
+
+                    start = time.time()
+
+                    while True:
+                        time.sleep(5)
+                        status = [
+                            x.text for x in driver.find_elements_by_class_name(
+                                'id_Success')
+                        ]
+                        if len(status) >= 8 or time.time() - start > 60:
+                            break
+
+                    for x in driver.find_elements_by_class_name('get_btn'):
+                        try:
+                            x.click()
+                        except Exception:
+                            continue
+
+                    current_window = driver.current_window_handle
+                    for handle in driver.window_handles:
+                        driver.switch_to.window(handle)
+                        try:
+                            LINK = driver.find_element_by_class_name(
+                                'code_wrap').text
+                            all_links.append(LINK)
+                            console.print(f'[[#50fa7b] OK [/#50fa7b]] {LINK}')
+                            logger.info(f'[ OK ] {LINK}')
+                            if handle != current_window:
+                                driver.close()
+                        except Exception:
+                            pass
+
+                except Exception as e:
+                    PyMirror.SeleniumExceptionInfo(e)
+
+                finally:
+                    driver.quit()
+
+            def multiup(driver, batch):
+                def cURL_request(url):
+                    cURL = shlex.split(url)
+                    out = subprocess.run(cURL, stdout=subprocess.PIPE)
+                    res = out.stdout.decode('UTF-8').replace('\\', '')
+                    try:
+                        res = json.loads(res)
+                    except JSONDecodeError:
+                        res = None
+                    return res
+
+                server = cURL_request(
+                    'curl -s https://www.multiup.org/api/get-fastest-server')['server']
+                selected_hosts_lst = ['filerio.in', 'drop.download', 'download.gg', 'uppit.com', 'uploadbox.io']
+                selected_hosts = ' '.join([f'-F {x}=true' for x in selected_hosts_lst])
+                upload = cURL_request(f'curl -sF files[]=@{file} {selected_hosts} {server}')
+                link = upload['files'][0]['url'].replace('download', 'en/mirror')
+                driver.get(link)
+
+                i, j = 0, 0
+
+                while True:
+                    time.sleep(1)
+                    if i != 0:
+                        if es_len != len(elements):
+                            j = 0
+                    driver.refresh()
+                    elements = driver.find_elements_by_class_name('host')    
+                    es_len = len(elements)
+                    if es_len == 2:
+                        i += 1
+                    else:
+                        j += 1
+                    if j > i + 10:
+                        break
+                    elif len(elements) == len(selected_hosts_lst) + 1:
+                        break
+
+                for e in elements:
+                    if '(0)' in e.text:
+                        link = e.get_attribute('link')
+                        all_links.append(link)
+                        console.print('[[#50fa7b] OK [/#50fa7b]]', link)
+
+                driver.quit()
+
+            if batch:
+                mirroredto(driver, batch)
+            else:
+                multiup(driver, batch)
 
         first_batch = [
             'GoFileIo', 'TusFiles', 'OneFichier', 'ZippyShare', 'UsersDrive',
@@ -264,85 +393,18 @@ class PyMirror:
             'MegaupNet', 'dlupload', 'file-upload'
         ]
 
-        driver = start_driver()
+        start_driver = PyMirror.start_driver
+        drivers = [start_driver(), start_driver(), start_driver()]
+        if False in drivers:
+            return
+        batches = [first_batch, second_batch, None]
 
-        for ls in [first_batch, second_batch]:
-            try:
-                time.sleep(2)
-                driver.get('https://www.mirrored.to/')
-                time.sleep(5)
-                html = driver.find_element_by_tag_name('html')
-                _ = [html.send_keys(Keys.ARROW_DOWN) for _ in range(3)]
+        with concurrent.futures.ThreadPoolExecutor() as executor:
+            futures = []
+            results = [executor.submit(mirror_services, driver, batch) for driver, batch in zip(drivers, batches)]
+            for future in concurrent.futures.as_completed(results):
+                futures.append(future.result())
 
-                for x in ls:
-                    try:
-                        driver.find_element_by_id(x.lower()).click()
-                    except Exception as e:
-                        PyMirror.SeleniumExceptionInfo(e)
-                        continue
-
-                time.sleep(2)
-                send_file = lambda selector: driver.find_element_by_css_selector(
-                    selector).send_keys(file)
-                driver.find_element_by_css_selector(
-                    '#uploadifive-html_file_upload > input[type=file]:nth-child(3)'
-                ).send_keys(file)
-                time.sleep(1)
-
-                driver.find_element_by_id('upload_button').click()
-                time.sleep(5)
-
-                while True:
-                    if driver.current_url != 'https://www.mirrored.to/':
-                        time.sleep(1)
-                        break
-
-                link = driver.find_element_by_class_name('mlink').text
-                driver.get(link)
-                time.sleep(2)
-                driver.find_element_by_class_name('secondary').click()
-                time.sleep(2)
-
-                start = time.time()
-
-                while True:
-                    time.sleep(5)
-                    status = [
-                        x.text for x in driver.find_elements_by_class_name(
-                            'id_Success')
-                    ]
-                    if len(status) >= 8 or time.time() - start > 60:
-                        break
-
-                for x in driver.find_elements_by_class_name('get_btn'):
-                    try:
-                        x.click()
-                    except:
-                        continue
-
-                current_window = driver.current_window_handle
-                for handle in driver.window_handles:
-                    driver.switch_to.window(handle)
-                    try:
-                        LINK = driver.find_element_by_class_name(
-                            'code_wrap').text
-                        all_links.append(LINK)
-                        console.print(f'[[#50fa7b] OK [/#50fa7b]] {LINK}')
-                        logger.info(f'[ OK ] {LINK}')
-                        if handle != current_window:
-                            driver.close()
-                    except:
-                        continue
-
-                time.sleep(2)
-                driver.switch_to.window(current_window)
-
-            except Exception as e:
-                PyMirror.SeleniumExceptionInfo(e)
-                driver.quit()
-                break
-
-        driver.quit()
 
     def style_output(args, LINKs: dict):
         names = list(LINKs.keys())
@@ -372,9 +434,6 @@ class PyMirror:
             logger.add(Config.LOG_FILE, level='DEBUG')
             logger.add(sys.stderr, level='ERROR')
 
-        if args.mirroredto is True:
-            data['mirroredto'] = {'server': 'https://mirrored.to'}
-
         console.print('Press `CTRL+C` at any time to quit.', style='#f1fa8c')
 
         if args.check_status is True:
@@ -400,9 +459,9 @@ class PyMirror:
         links_raw = PyMirror.api_uploads(args, data, responses, rfile)
         # links = PyMirror.match_links(links_raw)
 
-        if args.mirroredto is True:
+        if args.more_links is True:
             try:
-                urls = PyMirror.mirroredto(str(Path(rfile).resolve()))
+                urls = PyMirror.more_links(str(Path(rfile).resolve()))
             except WebDriverException as e:
                 PyMirror.SeleniumExceptionInfo(e)
 
@@ -426,7 +485,7 @@ class PyMirror:
                 os.remove(rfile)
         if Path(file).suffixes == ['.tar', '.gz']:
             os.remove(file)
-        console.rule('Results')
+        console.rule(f'Results: {len(all_links)}')
         print(output)
         os.rename(rfile, file)
         for x in all_links:
