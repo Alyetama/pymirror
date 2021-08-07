@@ -19,7 +19,7 @@ optional arguments:
   -i, --input INPUT                     Path to the input file/folder
   -s, --style {lines,list,markdown,reddit}
                                         Output style (default: lines)
-  -m, --mirroredto                      Use mirrored.to to generate more likes
+  -m, --more-links                      Uses Selenium to generate more links 
                                         (default: False)
   -n, --number NUMBER                   Select a specific number of servers to
                                         use (default: max)
@@ -67,9 +67,9 @@ Press `CTRL+C` at any time to quit.
 ```
 - View on [asciinema](https://asciinema.org/a/Rg1w7TPrjw9RBi7QTowr9158D?t=3)
 
-2. Use the `--mirroredto` (`-m`) flag<sup>1</sup> to upload to more hosting services (~ 20 more) utilizing Selenium<sup>2</sup>
+2. Use the `--more-links` (`-m`) flag<sup>1</sup> to upload to more hosting services (~ 25 more) utilizing Selenium<sup>2</sup>
 ```bash
-0:00:00 | ~/Desktop  | $ pymirror --input foo.txt --style markdown --mirroredto
+0:00:00 | ~/Desktop  | $ pymirror --input foo.txt --style markdown --more-links
 Press `CTRL+C` at any time to quit.
 ───────────────────────────────── Uploading... ─────────────────────────────────
 [ OK ] https://file.io/eDZG6VfnDN43
@@ -101,6 +101,7 @@ Press `CTRL+C` at any time to quit.
 [ OK ] https://dlupload.com/Download/file/N2VmNDEyNDkt
 [ OK ] https://mixdrop.co/f/o73e7316h49wj4
 [ OK ] https://megaup.net/Ydcb
+...and more!
 ─────────────────────────────────── Results ────────────────────────────────────
 - [file.io](https://file.io/eDZG6VfnDN43)
 - [gofile.io](https://gofile.io/d/QFNdfE)
@@ -131,6 +132,7 @@ Press `CTRL+C` at any time to quit.
 - [dlupload.com](https://dlupload.com/Download/file/N2VmNDEyNDkt)
 - [mixdrop.co](https://mixdrop.co/f/o73e7316h49wj4)
 - [megaup.net](https://megaup.net/Ydcb)
+...and more!
 ───────────────────────────────────── END ──────────────────────────────────────
 ```
 <sup>1</sup>Requires Firefox<br>
