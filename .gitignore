@@ -6,7 +6,6 @@ Icon?
 *.xpi
 /.idea/
 */.wdm/
-/pymirror/experimental/
 foo.txt
 test_*
 

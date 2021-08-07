@@ -1,6 +1,6 @@
 import argparse
 
-import pymirror
+from .pymirror import PyMirror
 
 
 class CustomHelpFormatter(argparse.HelpFormatter):
@@ -62,13 +62,13 @@ def main(**kwargs):
     parser.add_argument(
         '-l',
         '--log',
-        help='Log the current uploadto a file (default: False)',
+        help='Show logs and save it to a file (default: False)',
         action='store_true',
         default=False)
 
     args = parser.parse_args()
 
-    mirror = pymirror.PyMirror().uploader(args)
+    mirror = PyMirror().uploader(args)
 
 
 if __name__ == '__main__':

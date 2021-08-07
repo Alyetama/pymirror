@@ -4,6 +4,7 @@
 import argparse
 import concurrent.futures
 from glob import glob
+import importlib.util
 import json
 import multiprocessing as mp
 import os
@@ -30,10 +31,7 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.firefox.options import Options
 from webdriver_manager.firefox import GeckoDriverManager
 
-try:
-    from .config import Config
-except ImportError:
-    from config import Config  # For debugging
+from .config import Config
 
 console = Console()
 logger.remove()
@@ -68,6 +66,146 @@ class CustomHelpFormatter(argparse.HelpFormatter):
 
 def fmt(prog):
     return CustomHelpFormatter(prog)
+
+
+class StartDrive:
+    def __init__(self):
+        pass
+
+    def start_driver(headless=True):
+        check_ublock = [
+            x for x in glob(f'{Config.PROJECT_PATH}/*')
+            if Path(x).name == 'ublock_latest.xpi'
+        ]
+        if not check_ublock:
+            PyMirror.download_ublock()
+
+        options = Options()
+        profile = webdriver.FirefoxProfile()
+        profile.set_preference('media.volume_scale', '0.0')
+        if headless:
+            options.headless = True
+        try:
+            driver = webdriver.Firefox(options=options,
+                                       firefox_profile=profile,
+                                       service_log_path=os.path.devnull)
+            driver.install_addon(Config.UBLOCK, temporary=True)
+            return driver
+        except WebDriverException:
+            os.environ['WDM_LOG_LEVEL'] = '0'
+            os.environ['WDM_PRINT_FIRST_LINE'] = 'False'
+            os.environ['WDM_LOCAL'] = '1'
+            driver = webdriver.Firefox(
+                executable_path=GeckoDriverManager().install(),
+                options=options,
+                firefox_profile=profile,
+                service_log_path=os.path.devnull)
+            driver.install_addon(Config.UBLOCK, temporary=True)
+            return driver
+
+        except Exception as e:
+            SeleniumExceptionInfo(e)
+            console.print('[#ff5555]Something is wrong with Selenium! '
+                          'Try again or remove the `--more-links` flag')
+
+
+class MoreLinks:
+    def __init__(self, file, headless=True):
+        self.file = file
+        self.driver = StartDrive.start_driver(headless)
+
+    def usaupload(self):
+        self.driver.get('https://usaupload.com/register_non_user')
+        time.sleep(2)
+        self.driver.find_element_by_id('add_files_btn').send_keys(self.file)
+        self.driver.find_element_by_class_name('upload-button').click()
+        while True:
+            time.sleep(1)
+            try:
+                link = self.driver.find_element_by_class_name(
+                    'col-xs-4').get_attribute('dtfullurl')
+                if link:
+                    break
+            except:
+                continue
+        return link
+
+    def filesharego(self):
+        self.driver.get('https://www.filesharego.com')
+        time.sleep(2)
+        for e in self.driver.find_elements_by_class_name('nav-item'):
+            if 'Upload File' in e.text:
+                e.click()
+                break
+        time.sleep(2)
+        self.driver.find_element_by_class_name('dz-hidden-input').send_keys(
+            self.file)
+        while True:
+            try:
+                time.sleep(1)
+                link_id = self.driver.find_element_by_id('copy').get_attribute(
+                    'data-id')
+                link = self.driver.find_element_by_id(link_id).get_attribute(
+                    'value')
+                if link:
+                    break
+            except:
+                continue
+        return link
+
+    def filepizza(self):
+        self.driver.get('https://file.pizza/')
+        self.driver.find_element_by_css_selector(
+            '.select-file-label > input:nth-child(1)').send_keys(self.file)
+        while True:
+            time.sleep(1)
+            link = self.driver.find_element_by_class_name('short-url').text
+            if link:
+                break
+        link = link.replace('or, for short: ', '')
+        return link
+
+    def expirebox(self):
+        self.driver.get('https://expirebox.com/')
+        time.sleep(2)
+        self.driver.find_element_by_id('fileupload').send_keys(self.file)
+        while True:
+            time.sleep(1)
+            try:
+                link = self.driver.find_element_by_css_selector(
+                    'div.input-group:nth-child(3) > input:nth-child(1)'
+                ).get_attribute('value')
+                if link:
+                    break
+            except:
+                continue
+        return link
+
+    def filepost(self):
+        self.driver.get('https://filepost.io/')
+        self.driver.find_element_by_css_selector(
+            '.drop-region > input:nth-child(4)').send_keys(self.file)
+        while True:
+            time.sleep(1)
+            try:
+                e = self.driver.find_element_by_css_selector(
+                    'div.buttons:nth-child(3) > a:nth-child(1)')
+                link = e.get_attribute('href').split('&body=')[1]
+                if link:
+                    break
+            except:
+                continue
+        return link
+
+    @staticmethod
+    def process(fun):
+        try:
+            link = fun()
+            all_links.append(link)
+            console.print('[[#50fa7b] OK [/#50fa7b]]', link)
+            return link
+        except Exception:
+            return
 
 
 class PyMirror:
@@ -226,36 +364,6 @@ class PyMirror:
             'This is a one-time thing.\n',
             style='#f1fa8c')
 
-    def start_driver():
-        check_ublock = [
-            x for x in glob(f'{Config.PROJECT_PATH}/*')
-            if Path(x).name == 'ublock_latest.xpi'
-        ]
-        if not check_ublock:
-            PyMirror.download_ublock()
-
-        options = Options()
-        options.headless = True
-        try:
-            driver = webdriver.Firefox(options=options,
-                                       service_log_path=os.path.devnull)
-            driver.install_addon(Config.UBLOCK, temporary=True)
-            return driver
-        except WebDriverException:
-            os.environ['WDM_LOG_LEVEL'] = '0'
-            os.environ['WDM_PRINT_FIRST_LINE'] = 'False'
-            os.environ['WDM_LOCAL'] = '1'
-            driver = webdriver.Firefox(
-                executable_path=GeckoDriverManager().install(),
-                options=options,
-                service_log_path=os.path.devnull)
-            driver.install_addon(Config.UBLOCK, temporary=True)
-            return driver
-
-        except Exception as e:
-            SeleniumExceptionInfo(e)
-            console.print('[#ff5555]Something is wrong with Selenium!  Try again or remove the `--more-links` flag')
-
     def more_links(file: str):
         def mirror_services(driver, batch):
             def mirroredto(driver, batch):
@@ -344,14 +452,22 @@ class PyMirror:
                     return res
 
                 server = cURL_request(
-                    'curl -s https://www.multiup.org/api/get-fastest-server')['server']
-                selected_hosts_lst = ['filerio.in', 'drop.download', 'download.gg', 'uppit.com', 'uploadbox.io']
-                selected_hosts = ' '.join([f'-F {x}=true' for x in selected_hosts_lst])
-                upload = cURL_request(f'curl -sF files[]=@{file} {selected_hosts} {server}')
-                link = upload['files'][0]['url'].replace('download', 'en/mirror')
+                    'curl -s https://www.multiup.org/api/get-fastest-server'
+                )['server']
+                selected_hosts_lst = [
+                    'filerio.in', 'drop.download', 'download.gg', 'uppit.com',
+                    'uploadbox.io'
+                ]
+                selected_hosts = ' '.join(
+                    [f'-F {x}=true' for x in selected_hosts_lst])
+                upload = cURL_request(
+                    f'curl -sF files[]=@{file} {selected_hosts} {server}')
+                link = upload['files'][0]['url'].replace(
+                    'download', 'en/mirror')
                 driver.get(link)
 
-                i, j = 0, 0
+                i = 0
+                j = 0
 
                 while True:
                     time.sleep(1)
@@ -359,7 +475,7 @@ class PyMirror:
                         if es_len != len(elements):
                             j = 0
                     driver.refresh()
-                    elements = driver.find_elements_by_class_name('host')    
+                    elements = driver.find_elements_by_class_name('host')
                     es_len = len(elements)
                     if es_len == 2:
                         i += 1
@@ -393,7 +509,7 @@ class PyMirror:
             'MegaupNet', 'dlupload', 'file-upload'
         ]
 
-        start_driver = PyMirror.start_driver
+        start_driver = StartDrive.start_driver
         drivers = [start_driver(), start_driver(), start_driver()]
         if False in drivers:
             return
@@ -401,10 +517,12 @@ class PyMirror:
 
         with concurrent.futures.ThreadPoolExecutor() as executor:
             futures = []
-            results = [executor.submit(mirror_services, driver, batch) for driver, batch in zip(drivers, batches)]
+            results = [
+                executor.submit(mirror_services, driver, batch)
+                for driver, batch in zip(drivers, batches)
+            ]
             for future in concurrent.futures.as_completed(results):
                 futures.append(future.result())
-
 
     def style_output(args, LINKs: dict):
         names = list(LINKs.keys())
@@ -460,10 +578,28 @@ class PyMirror:
         # links = PyMirror.match_links(links_raw)
 
         if args.more_links is True:
+            file_resolved = str(Path(rfile).resolve())
             try:
-                urls = PyMirror.more_links(str(Path(rfile).resolve()))
+                urls = PyMirror.more_links(file_resolved)
             except WebDriverException as e:
                 PyMirror.SeleniumExceptionInfo(e)
+
+            hosts = [
+                MoreLinks(file_resolved).filepizza,
+                MoreLinks(file_resolved).usaupload,
+                MoreLinks(file_resolved).filesharego,
+                MoreLinks(file_resolved).expirebox,
+                MoreLinks(file_resolved).filepost
+            ]
+
+            with concurrent.futures.ThreadPoolExecutor() as executor:
+                futures = []
+                results = [
+                    executor.submit(MoreLinks(file_resolved).process, fun)
+                    for fun in hosts
+                ]
+                for future in concurrent.futures.as_completed(results):
+                    futures.append(future.result())
 
         LINKs = {}
 
