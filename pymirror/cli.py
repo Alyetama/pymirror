@@ -29,7 +29,7 @@ def main(**kwargs):
                         action='help',
                         default=argparse.SUPPRESS,
                         help='Show this help message and exit')
-    parser.add_argument('-i', '--input', help='Path to the input file/folder')
+    parser.add_argument('-i', '--input', help='Path to the input file/folder', required=True)
     parser.add_argument('-s',
                         '--style',
                         help='Output style (default: lines)',

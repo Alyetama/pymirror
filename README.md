@@ -136,7 +136,8 @@ Press `CTRL+C` at any time to quit.
 ───────────────────────────────────── END ──────────────────────────────────────
 ```
 <sup>1</sup>Requires Firefox<br>
-<sup>2</sup>Gecko driver will installed automatically if it does not already exist
+<sup>2</sup>A temporary Gecko driver will be installed automatically if it does not already exist
 
 ## To do
 - [ ] Filter servers by upload limit
+

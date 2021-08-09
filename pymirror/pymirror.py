@@ -23,6 +23,7 @@ import time
 import traceback
 from pathlib import Path
 
+from dracula import DraculaPalette as dp
 from rich.console import Console
 from loguru import logger
 from selenium import webdriver
@@ -47,7 +48,7 @@ class KeyboardInterruptHandler:
         sys.tracebacklimit = 0
         print('', end='\r')
         time.sleep(0.5)
-        console.print('[#f1fa8c]Quitting...')
+        console.print(f'[{dp.y}]Quitting...')
         logger.info('Interrupted by the user.')
         sys.exit(0)
 
@@ -105,7 +106,7 @@ class StartDrive:
 
         except Exception as e:
             SeleniumExceptionInfo(e)
-            console.print('[#ff5555]Something is wrong with Selenium! '
+            console.print(f'[{dp.y}]Something is wrong with Selenium! '
                           'Try again or remove the `--more-links` flag')
 
 
@@ -202,7 +203,7 @@ class MoreLinks:
         try:
             link = fun()
             all_links.append(link)
-            console.print('[[#50fa7b] OK [/#50fa7b]]', link)
+            console.print(f'[[{dp.g}] OK [/{dp.g}]]', link)
             return link
         except Exception:
             return
@@ -268,13 +269,13 @@ class PyMirror:
             response = os.system(f'ping -c 1 {ip[0]} > /dev/null 2>&1')
         if response in [0, 256, 512]:
             console.print(
-                f'[[#50fa7b] OK [/#50fa7b]] [#8be9fd]{ip[1]}[/#8be9fd] is online!'
+                f'[[{dp.g}] OK [/{dp.g}]] [{dp.c}]{ip[1]}[/{dp.c}] is online!'
             )
             logger.info(f'{ip[1]} is online!')
             return True
         else:
             console.print(
-                f'[[#ff5555] ERROR! [/#ff5555]] [#8be9fd]{ip[1]}[/#8be9fd] is down!'
+                f'[[{dp.r}] ERROR! [/{dp.r}]] [{dp.c}]{ip[1]}[/{dp.c}] is down!'
             )
             logger.warning(f'{ip[1]} is offline!')
             return False
@@ -322,7 +323,7 @@ class PyMirror:
                 link = PyMirror.curl(data, k, rfile)
                 if 'bad gateway' in link.lower() or 'error' in link.lower():
                     raise Exception
-                console.print('[[#50fa7b] OK [/#50fa7b]]', link)
+                console.print(f'[[{dp.g}] OK [/{dp.g}]]', link)
                 all_links.append(link)
                 logger.info(f'[ OK ] {link}')
                 times.append(time.time() - start)
@@ -427,7 +428,7 @@ class PyMirror:
                             LINK = driver.find_element_by_class_name(
                                 'code_wrap').text
                             all_links.append(LINK)
-                            console.print(f'[[#50fa7b] OK [/#50fa7b]] {LINK}')
+                            console.print(f'[[{dp.g}] OK [/{dp.g}]] {LINK}')
                             logger.info(f'[ OK ] {LINK}')
                             if handle != current_window:
                                 driver.close()
@@ -490,7 +491,7 @@ class PyMirror:
                     if '(0)' in e.text:
                         link = e.get_attribute('link')
                         all_links.append(link)
-                        console.print('[[#50fa7b] OK [/#50fa7b]]', link)
+                        console.print(f'[[{dp.g}] OK [/{dp.g}]]', link)
 
                 driver.quit()
 
