@@ -1,6 +1,6 @@
 import argparse
 
-from .pymirror import PyMirror
+from .pymirror import PyMirror, FirefoxInterrupt, pids
 
 
 class CustomHelpFormatter(argparse.HelpFormatter):
@@ -45,7 +45,6 @@ def main(**kwargs):
         '-n',
         '--number',
         help='Select a specific number of servers to use (default: max)',
-        type=int,
         default=None)
     parser.add_argument(
         '-d',
@@ -72,4 +71,7 @@ def main(**kwargs):
 
 
 if __name__ == '__main__':
-    main()
+    try:
+        main()
+    except Exception:
+        FirefoxInterrupt.firefoxInterrupt(pids)

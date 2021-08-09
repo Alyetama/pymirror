@@ -13,7 +13,8 @@ dependencies = [
     "selenium>=3.141.0",
     "webdriver_manager>=3.4.2",
     "dracula>=0.1.2",
-    "loguru>=0.5.3"
+    "loguru>=0.5.3",
+    "psutil>=5.8.0"
 ]
 
 [project.urls]

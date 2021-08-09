@@ -24,6 +24,7 @@ import traceback
 from pathlib import Path
 
 from dracula import DraculaPalette as dp
+import psutil
 from rich.console import Console
 from loguru import logger
 from selenium import webdriver
@@ -38,17 +39,35 @@ console = Console()
 logger.remove()
 
 all_links = []
+pids = []
+
+
+class FirefoxInterrupt:
+    def __init__(self):
+        pass
+
+    @staticmethod
+    def firefoxInterrupt(pids):
+        if pids:
+            for pid in pids:
+                try:
+                    p = psutil.Process(pid)
+                    p.terminate()
+                except psutil.NoSuchProcess:
+                    continue
 
 
 class KeyboardInterruptHandler:
     def __init__(self):
         pass
 
+    @staticmethod
     def keyboardInterruptHandler(*args):
         sys.tracebacklimit = 0
         print('', end='\r')
         time.sleep(0.5)
         console.print(f'[{dp.y}]Quitting...')
+        FirefoxInterrupt.firefoxInterrupt(pids)
         logger.info('Interrupted by the user.')
         sys.exit(0)
 
@@ -73,6 +92,7 @@ class StartDrive:
     def __init__(self):
         pass
 
+    @staticmethod
     def start_driver(headless=True):
         check_ublock = [
             x for x in glob(f'{Config.PROJECT_PATH}/*')
@@ -90,8 +110,6 @@ class StartDrive:
             driver = webdriver.Firefox(options=options,
                                        firefox_profile=profile,
                                        service_log_path=os.path.devnull)
-            driver.install_addon(Config.UBLOCK, temporary=True)
-            return driver
         except WebDriverException:
             os.environ['WDM_LOG_LEVEL'] = '0'
             os.environ['WDM_PRINT_FIRST_LINE'] = 'False'
@@ -104,13 +122,22 @@ class StartDrive:
                     service_log_path=os.path.devnull)
             except ValueError:
                 raise Exception('Could not find Firefox!')
-            driver.install_addon(Config.UBLOCK, temporary=True)
-            return driver
-
+            except OSError:
+                if platform.node() == 'raspberrypi':
+                    raise Exception(
+                        'It seems like you\'re on a raspberrypi. '
+                        'You will need to build gecko driver for ARM: '
+                        'https://firefox-source-docs.mozilla.org/testing/'
+                        'geckodriver/ARM.html')
         except Exception as e:
             SeleniumExceptionInfo(e)
             console.print(f'[{dp.y}]Something is wrong with Selenium! '
                           'Try again or remove the `--more-links` flag')
+
+        driver.install_addon(Config.UBLOCK, temporary=True)
+        capabilities = driver.capabilities
+        pids.append(capabilities['moz:processID'])
+        return driver
 
 
 class MoreLinks:
@@ -272,8 +299,7 @@ class PyMirror:
             response = os.system(f'ping -c 1 {ip[0]} > /dev/null 2>&1')
         if response in [0, 256, 512]:
             console.print(
-                f'[[{dp.g}] OK [/{dp.g}]] [{dp.c}]{ip[1]}[/{dp.c}] is online!'
-            )
+                f'[[{dp.g}] OK [/{dp.g}]] [{dp.c}]{ip[1]}[/{dp.c}] is online!')
             logger.info(f'{ip[1]} is online!')
             return True
         else:
@@ -314,7 +340,7 @@ class PyMirror:
         times = []
         for n, ((k, _), res) in enumerate(zip(data.items(), responses)):
             if args.number:
-                if n == args.number:
+                if n == int(args.number):
                     break
             if res is False:
                 continue
