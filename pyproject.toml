@@ -8,6 +8,13 @@ authors = [{name = "Alyetama", email = "56323389+Alyetama@users.noreply.github.c
 readme = "README.md"
 classifiers = ["License :: OSI Approved :: MIT License"]
 dynamic = ["version", "description"]
+dependencies = [
+    "rich>=9.1.0",
+    "selenium>=3.141.0",
+    "webdriver_manager>=3.4.2",
+    "dracula>=0.1.2",
+    "loguru>=0.5.3"
+]
 
 [project.urls]
 Home = "https://github.com/Alyetama/pymirror"

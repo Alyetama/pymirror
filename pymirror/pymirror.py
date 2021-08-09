@@ -96,11 +96,14 @@ class StartDrive:
             os.environ['WDM_LOG_LEVEL'] = '0'
             os.environ['WDM_PRINT_FIRST_LINE'] = 'False'
             os.environ['WDM_LOCAL'] = '1'
-            driver = webdriver.Firefox(
-                executable_path=GeckoDriverManager().install(),
-                options=options,
-                firefox_profile=profile,
-                service_log_path=os.path.devnull)
+            try:
+                driver = webdriver.Firefox(
+                    executable_path=GeckoDriverManager().install(),
+                    options=options,
+                    firefox_profile=profile,
+                    service_log_path=os.path.devnull)
+            except ValueError:
+                raise Exception('Could not find Firefox!')
             driver.install_addon(Config.UBLOCK, temporary=True)
             return driver
 
