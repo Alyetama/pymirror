@@ -712,9 +712,11 @@ class PyMirror:
         for x in all_links:
             logger.info(x)
         print()
-        run_time = time.strftime('%H:%M:%S', time.gmtime(time.time() - start_time))
+        run_time = time.strftime('%H:%M:%S',
+                                 time.gmtime(time.time() - start_time))
         h, m, s = [int(_) for _ in run_time.split(':')]
-        console.print(Panel.fit(f'[{dp.k}]Process took[{dp.k}] [{dp.y}]{h}h {m}m {s}s'))
+        console.print(
+            Panel.fit(f'[{dp.k}]Process took[{dp.k}] [{dp.y}]{h}h {m}m {s}s'))
         console.rule('END')
 
         return output
