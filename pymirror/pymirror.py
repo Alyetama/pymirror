@@ -27,6 +27,7 @@ from pathlib import Path
 from dracula import DraculaPalette as dp
 import psutil
 from rich.console import Console
+from rich.panel import Panel
 from loguru import logger
 from selenium import webdriver
 from selenium.common.exceptions import WebDriverException
@@ -710,10 +711,10 @@ class PyMirror:
         os.rename(rfile, file)
         for x in all_links:
             logger.info(x)
-
+        print()
         run_time = time.strftime('%H:%M:%S', time.gmtime(time.time() - start_time))
         h, m, s = [int(_) for _ in run_time.split(':')]
-        console.print(Panel.fit(f'{dp.k}Process took{dp.k} {dp.y}{h}h {m}m {s}s'))
+        console.print(Panel.fit(f'[{dp.k}]Process took[{dp.k}] [{dp.y}]{h}h {m}m {s}s'))
         console.rule('END')
 
         return output
