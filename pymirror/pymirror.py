@@ -21,6 +21,7 @@ import sys
 import tarfile
 import time
 import traceback
+from typing import Union, NoReturn
 from pathlib import Path
 
 from dracula import DraculaPalette as dp
@@ -46,11 +47,11 @@ pids = []
 
 
 class FirefoxInterrupt:
-    def __init__(self):
+    def __init__(self) -> None:
         pass
 
     @staticmethod
-    def firefoxInterrupt(pids):
+    def firefoxInterrupt(pids) -> None:
         if pids:
             for pid in pids:
                 try:
@@ -61,7 +62,7 @@ class FirefoxInterrupt:
 
 
 class KeyboardInterruptHandler:
-    def __init__(self):
+    def __init__(self) -> None:
         pass
 
     @staticmethod
@@ -75,28 +76,12 @@ class KeyboardInterruptHandler:
         sys.exit(0)
 
 
-class CustomHelpFormatter(argparse.HelpFormatter):
-    def __init__(self, prog):
-        super().__init__(prog, max_help_position=40, width=80)
-
-    def _format_action_invocation(self, action):
-        if not action.option_strings or action.nargs == 0:
-            return super()._format_action_invocation(action)
-        default = self._get_default_metavar_for_optional(action)
-        args_string = self._format_args(action, default)
-        return ', '.join(action.option_strings) + ' ' + args_string
-
-
-def fmt(prog):
-    return CustomHelpFormatter(prog)
-
-
 class StartDrive:
-    def __init__(self):
+    def __init__(self) -> None:
         pass
 
     @staticmethod
-    def start_driver(headless=True):
+    def start_driver(headless: bool = True):
         check_ublock = [
             x for x in glob(f'{Config.PROJECT_PATH}/*')
             if Path(x).name == 'ublock_latest.xpi'
@@ -144,12 +129,12 @@ class StartDrive:
 
 
 class MoreLinks:
-    def __init__(self, file, headless=True):
+    def __init__(self, file: str, headless: bool = True) -> None:
         self.file = file
         self.file_size = Path(file).stat().st_size / 1e+6
         self.driver = StartDrive.start_driver(headless)
 
-    def usaupload(self):
+    def usaupload(self) -> str:
         if self.file_size > 1000:
             return
         self.driver.get('https://usaupload.com/register_non_user')
@@ -167,7 +152,7 @@ class MoreLinks:
                 continue
         return link
 
-    def filesharego(self):
+    def filesharego(self) -> str:
         if self.file_size > 5000:
             return
         self.driver.get('https://www.filesharego.com')
@@ -192,7 +177,7 @@ class MoreLinks:
                 continue
         return link
 
-    def filepizza(self):
+    def filepizza(self) -> str:
         self.driver.get('https://file.pizza/')
         self.driver.find_element_by_css_selector(
             '.select-file-label > input:nth-child(1)').send_keys(self.file)
@@ -204,7 +189,7 @@ class MoreLinks:
         link = link.replace('or, for short: ', '')
         return link
 
-    def expirebox(self):
+    def expirebox(self) -> str:
         if self.file_size > 200:
             return
         self.driver.get('https://expirebox.com/')
@@ -222,7 +207,7 @@ class MoreLinks:
                 continue
         return link
 
-    def filepost(self):
+    def filepost(self) -> str:
         if self.file_size > 3000:
             return
         self.driver.get('https://filepost.io/')
@@ -252,12 +237,12 @@ class MoreLinks:
 
 
 class PyMirror:
-    def __init__(self):
+    def __init__(self) -> None:
         pass
 
     def custom_error_traceback(exception: Exception,
                                error_msg: str,
-                               log: bool = False):
+                               log: bool = False) -> list:
         if log:
             logger.error(error_msg)
         tb = traceback.format_exception(None, exception,
@@ -269,13 +254,13 @@ class PyMirror:
             logger.error(f'{"-" * 10} End of error traceback {"-" * 10}')
         return tb
 
-    def tgz(input_folder: str):
+    def tgz(input_folder: str) -> str:
         out_file = f'{Path(input_folder).parent}/{Path(input_folder).name}.tar.gz'
         with tarfile.open(out_file, 'w:gz') as t:
             t.add(input_folder, arcname=Path(input_folder).name)
         return out_file
 
-    def clean_filename(file: str):
+    def clean_filename(file: str) -> str:
         rfile = ''.join([
             Path(x).stem.replace(x, "_") if x in string.punctuation +
             ' ' else x for x in Path(Path(file).stem).stem
@@ -285,15 +270,17 @@ class PyMirror:
         os.rename(file, rfile)
         return rfile
 
-    def initializer():
+    def initializer() -> NoReturn:
         signal.signal(signal.SIGINT, signal.SIG_IGN)
 
-    def SeleniumExceptionInfo(exception: Exception):
+    def SeleniumExceptionInfo(exception: Exception) -> str:
         tb = traceback.format_exception(None, exception,
                                         exception.__traceback__)
-        logger.error(f'Selenium encountered an error: {tb}')
+        tb = ''.join(tb).rstrip()
+        logger.error(f'Selenium encountered an error:\n{tb}')
+        return tb
 
-    def return_ips(data: dict):
+    def return_ips(data: dict) -> list:
         ips = []
         for k, v in data.items():
             try:
@@ -304,7 +291,7 @@ class PyMirror:
             ips.append((ip, k))
         return ips
 
-    def ping(ip: str):
+    def ping(ip: str) -> bool:
         if platform.system() == 'Windows':
             response = os.system(f'ping -n 1 {ip[0]} > /dev/null 2>&1')
         else:
@@ -321,7 +308,7 @@ class PyMirror:
             logger.warning(f'{ip[1]} is offline!')
             return False
 
-    def curl(data: dict, server: str, file: str):
+    def curl(data: dict, server: str, file: str) -> str:
         file_size = Path(file).stat().st_size / 1e+6
         size_limit = data[server]['limit']
         if file_size > size_limit:
@@ -352,8 +339,9 @@ class PyMirror:
 
         return link
 
-    def api_uploads(args, data: dict, responses: list, rfile: str):
+    def api_uploads(args, data: dict, responses: list, rfile: str) -> list:
         times = []
+        api_uploads_links = []
         for n, ((k, _), res) in enumerate(zip(data.items(), responses)):
             if args.number:
                 if n == int(args.number):
@@ -370,6 +358,7 @@ class PyMirror:
                     raise Exception
                 console.print(f'[[{dp.g}] OK [/{dp.g}]]', link)
                 all_links.append(link)
+                api_uploads_links.append(link)
                 logger.info(f'[ OK ] {link}')
                 times.append(time.time() - start)
             except ZeroDivisionError:
@@ -382,8 +371,9 @@ class PyMirror:
                                                 log=args.log)
             finally:
                 signal.alarm(0)
+        return api_uploads_links
 
-    def match_links(links_raw: list):
+    def _match_links(links_raw: list) -> list:
         regex = re.compile(
             r'^(?:http|ftp)s?://'
             r'(?:(?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\.)+'
@@ -399,7 +389,7 @@ class PyMirror:
                 links.append(link)
         return links
 
-    def download_ublock():
+    def download_ublock() -> None:
         latest = 'https://addons.mozilla.org/firefox/downloads/file/3806442'
         out = os.popen(
             f'curl -sLo {Config.PROJECT_PATH}/ublock_latest.xpi {latest}'
@@ -409,14 +399,24 @@ class PyMirror:
             'for the first time. Please wait until everything is ready. '
             'This is a one-time thing.\n',
             style='#f1fa8c')
+        assert Path(f'{Config.PROJECT_PATH}/ublock_latest.xpi').exists()
 
-    def more_links(file: str):
+    def more_links(args, file: str) -> list:
         file_size = Path(file).stat().st_size / 1e+6
-        with open('data/more_links.json') as j:
+        with open(f'{Config.DATA_PATH}/more_links.json') as j:
             more_links = json.load(j)
-        def mirror_services(driver, batch):
-            def mirroredto(driver, batch):
+
+        def mirror_services(driver, batch: list) -> list:
+            local_limit = len(all_links)
+
+            def mirroredto(driver, batch: list) -> list:
+                mirroredto_links = []
                 try:
+                    if args.number:
+                        if local_limit >= int(args.number):
+                            return
+                        else:
+                            local_limit += 1
                     time.sleep(2)
                     driver.get('https://www.mirrored.to/')
                     time.sleep(5)
@@ -427,7 +427,8 @@ class PyMirror:
                         try:
                             if len(batch) > 8 and x == 'GoFileIo':
                                 driver.find_element_by_id(x.lower()).click()
-                            elif more_links['mirroredto'][x]['limit'] > file_size:
+                            elif more_links['mirroredto'][x][
+                                    'limit'] > file_size:
                                 driver.find_element_by_id(x.lower()).click()
                         except Exception as e:
                             PyMirror.SeleniumExceptionInfo(e)
@@ -479,6 +480,7 @@ class PyMirror:
                             LINK = driver.find_element_by_class_name(
                                 'code_wrap').text
                             all_links.append(LINK)
+                            mirroredto_links.append(LINK)
                             console.print(f'[[{dp.g}] OK [/{dp.g}]] {LINK}')
                             logger.info(f'[ OK ] {LINK}')
                             if handle != current_window:
@@ -492,8 +494,10 @@ class PyMirror:
                 finally:
                     driver.quit()
 
-            def multiup(driver, batch):
-                def cURL_request(url):
+                return mirroredto_links
+
+            def multiup(driver, batch: None) -> list:
+                def cURL_request(url: str) -> Union[None, dict]:
                     cURL = shlex.split(url)
                     out = subprocess.run(cURL, stdout=subprocess.PIPE)
                     res = out.stdout.decode('UTF-8').replace('\\', '')
@@ -503,6 +507,8 @@ class PyMirror:
                         res = None
                     return res
 
+                multiup_links = []
+
                 server = cURL_request(
                     'curl -s https://www.multiup.org/api/get-fastest-server'
                 )['server']
@@ -510,9 +516,19 @@ class PyMirror:
                     'filerio.in', 'drop.download', 'download.gg', 'uppit.com',
                     'uploadbox.io'
                 ]
+                limit_n = len(all_links)
                 for x in selected_hosts_lst:
-                    if file_size > more_links['multiup'][x]:
+                    if args.number:
+                        if int(args.number) <= limit_n:
+                            selected_hosts_lst.remove(x)
+                            continue
+                    if file_size > more_links['multiup'][x]['limit']:
                         selected_hosts_lst.remove(x)
+                    else:
+                        limit_n += 1
+                if not selected_hosts_lst:
+                    return
+
                 selected_hosts = ' '.join(
                     [f'-F {x}=true' for x in selected_hosts_lst])
                 upload = cURL_request(
@@ -545,14 +561,19 @@ class PyMirror:
                     if '(0)' in e.text:
                         link = e.get_attribute('link')
                         all_links.append(link)
+                        multiup_links.append(link)
                         console.print(f'[[{dp.g}] OK [/{dp.g}]]', link)
 
                 driver.quit()
 
+                return multiup_links
+
             if batch:
-                mirroredto(driver, batch)
+                batch_links = mirroredto(driver, batch)
             else:
-                multiup(driver, batch)
+                batch_links = multiup(driver, batch)
+
+            return batch_links
 
         first_batch = [
             'GoFileIo', 'TusFiles', 'OneFichier', 'ZippyShare', 'UsersDrive',
@@ -579,7 +600,9 @@ class PyMirror:
             for future in concurrent.futures.as_completed(results):
                 futures.append(future.result())
 
-    def style_output(args, LINKs: dict):
+        return results
+
+    def style_output(args, LINKs: dict) -> Union[list, str]:
         names = list(LINKs.keys())
         links = list(LINKs.values())
         style = args.style
@@ -595,11 +618,12 @@ class PyMirror:
             output = '\n'.join(links)
         return output
 
-    def uploader(self, args):
+    def uploader(self, args) -> Union[list, str]:
+        start_time = time.time()
         signal.signal(signal.SIGINT,
                       KeyboardInterruptHandler.keyboardInterruptHandler)
 
-        with open(Config.DATA) as j:
+        with open(f'{Config.DATA_PATH}/servers_data.json') as j:
             data = json.load(j)
 
         if args.log:
@@ -630,12 +654,12 @@ class PyMirror:
             responses = [True] * len(data.keys())
 
         links_raw = PyMirror.api_uploads(args, data, responses, rfile)
-        # links = PyMirror.match_links(links_raw)
+        # links = PyMirror._match_links(links_raw)
 
         if args.more_links is True:
             file_resolved = str(Path(rfile).resolve())
             try:
-                urls = PyMirror.more_links(file_resolved)
+                urls = PyMirror.more_links(args, file_resolved)
             except WebDriverException as e:
                 PyMirror.SeleniumExceptionInfo(e)
 
@@ -646,6 +670,11 @@ class PyMirror:
                 MoreLinks(file_resolved).expirebox,
                 MoreLinks(file_resolved).filepost
             ]
+
+            if args.number:
+                if int(args.number) < len(all_links) + 5:
+                    left = int(args.number) - len(all_links)
+                    hosts = hosts[:left]
 
             with concurrent.futures.ThreadPoolExecutor() as executor:
                 futures = []
@@ -681,4 +710,10 @@ class PyMirror:
         os.rename(rfile, file)
         for x in all_links:
             logger.info(x)
+
+        run_time = time.strftime('%H:%M:%S', time.gmtime(time.time() - start_time))
+        h, m, s = [int(_) for _ in run_time.split(':')]
+        console.print(Panel.fit(f'{dp.k}Process took{dp.k} {dp.y}{h}h {m}m {s}s'))
         console.rule('END')
+
+        return output
