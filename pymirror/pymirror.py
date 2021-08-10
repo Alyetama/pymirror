@@ -33,7 +33,10 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.firefox.options import Options
 from webdriver_manager.firefox import GeckoDriverManager
 
-from .config import Config
+try:
+    from .config import Config
+except ImportError:
+    from config import Config
 
 console = Console()
 logger.remove()
@@ -143,9 +146,12 @@ class StartDrive:
 class MoreLinks:
     def __init__(self, file, headless=True):
         self.file = file
+        self.file_size = Path(file).stat().st_size / 1e+6
         self.driver = StartDrive.start_driver(headless)
 
     def usaupload(self):
+        if self.file_size > 1000:
+            return
         self.driver.get('https://usaupload.com/register_non_user')
         time.sleep(2)
         self.driver.find_element_by_id('add_files_btn').send_keys(self.file)
@@ -162,6 +168,8 @@ class MoreLinks:
         return link
 
     def filesharego(self):
+        if self.file_size > 5000:
+            return
         self.driver.get('https://www.filesharego.com')
         time.sleep(2)
         for e in self.driver.find_elements_by_class_name('nav-item'):
@@ -197,6 +205,8 @@ class MoreLinks:
         return link
 
     def expirebox(self):
+        if self.file_size > 200:
+            return
         self.driver.get('https://expirebox.com/')
         time.sleep(2)
         self.driver.find_element_by_id('fileupload').send_keys(self.file)
@@ -213,6 +223,8 @@ class MoreLinks:
         return link
 
     def filepost(self):
+        if self.file_size > 3000:
+            return
         self.driver.get('https://filepost.io/')
         self.driver.find_element_by_css_selector(
             '.drop-region > input:nth-child(4)').send_keys(self.file)
@@ -310,6 +322,10 @@ class PyMirror:
             return False
 
     def curl(data: dict, server: str, file: str):
+        file_size = Path(file).stat().st_size / 1e+6
+        size_limit = data[server]['limit']
+        if file_size > size_limit:
+            return
         srv = data[server]['server']
         keys = data[server]['keys']
         flags = data[server]['flags']
@@ -395,6 +411,9 @@ class PyMirror:
             style='#f1fa8c')
 
     def more_links(file: str):
+        file_size = Path(file).stat().st_size / 1e+6
+        with open('data/more_links.json') as j:
+            more_links = json.load(j)
         def mirror_services(driver, batch):
             def mirroredto(driver, batch):
                 try:
@@ -406,7 +425,10 @@ class PyMirror:
 
                     for x in batch:
                         try:
-                            driver.find_element_by_id(x.lower()).click()
+                            if len(batch) > 8 and x == 'GoFileIo':
+                                driver.find_element_by_id(x.lower()).click()
+                            elif more_links['mirroredto'][x]['limit'] > file_size:
+                                driver.find_element_by_id(x.lower()).click()
                         except Exception as e:
                             PyMirror.SeleniumExceptionInfo(e)
                             continue
@@ -488,6 +510,9 @@ class PyMirror:
                     'filerio.in', 'drop.download', 'download.gg', 'uppit.com',
                     'uploadbox.io'
                 ]
+                for x in selected_hosts_lst:
+                    if file_size > more_links['multiup'][x]:
+                        selected_hosts_lst.remove(x)
                 selected_hosts = ' '.join(
                     [f'-F {x}=true' for x in selected_hosts_lst])
                 upload = cURL_request(

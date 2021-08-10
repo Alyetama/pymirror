@@ -7,7 +7,8 @@
             "link"
         ],
         "flags": "-sF",
-        "parameter": "file=@"
+        "parameter": "file=@",
+        "limit": 100
     },
     "gofile":
     {
@@ -18,7 +19,8 @@
             "downloadPage"
         ],
         "flags": "-sF",
-        "parameter": "file=@"
+        "parameter": "file=@",
+        "limit": 1.0E+11
     },
     "uguu":
     {
@@ -30,7 +32,8 @@
             "url"
         ],
         "flags": "-sF",
-        "parameter": "files[]=@"
+        "parameter": "files[]=@",
+        "limit": 134
     },
     "transfersh":
     {
@@ -38,7 +41,8 @@
         "keys":
         [],
         "flags": "-sF",
-        "parameter": "file=@"
+        "parameter": "file=@",
+        "limit": 10000
     },
     "oshi":
     {
@@ -46,7 +50,8 @@
         "keys":
         [],
         "flags": "-sF",
-        "parameter": "files[]=@"
+        "parameter": "files[]=@",
+        "limit": 5000
     },
     "0x0":
     {
@@ -54,7 +59,8 @@
         "keys":
         [],
         "flags": "-sF",
-        "parameter": "file=@"
+        "parameter": "file=@",
+        "limit": 536
     },
     "ttm":
     {
@@ -62,7 +68,8 @@
         "keys":
         [],
         "flags": "-sF",
-        "parameter": "file=@"
+        "parameter": "file=@",
+        "limit": 268
     },
     "filepush":
     {
@@ -70,7 +77,8 @@
         "keys":
         [],
         "flags": "-s --upload-file",
-        "parameter": ""
+        "parameter": "",
+        "limit": 32
     },
     "tempsh":
     {
@@ -78,7 +86,8 @@
         "keys":
         [],
         "flags": "-sT",
-        "parameter": ""
+        "parameter": "",
+        "limit": 2000
     },
     "fileditch":
     {
@@ -90,7 +99,8 @@
             "url"
         ],
         "flags": "-sF",
-        "parameter": "files[]=@"
+        "parameter": "files[]=@",
+        "limit": 15000
     },
     "pomflainla":
     {
@@ -102,7 +112,8 @@
             "url"
         ],
         "flags": "-sF",
-        "parameter": "files[]=@"
+        "parameter": "files[]=@",
+        "limit": 536
     },
     "midi":
     {
@@ -114,6 +125,7 @@
             "url"
         ],
         "flags": "-sF",
-        "parameter": "files[]=@"
+        "parameter": "files[]=@",
+        "limit": 209
     }
 }

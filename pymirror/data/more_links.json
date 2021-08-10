@@ -1,0 +1,131 @@
+{
+    "mirroredto":
+    {
+        "ClicknUpload":
+        {
+            "limit": 500
+        },
+        "MegaupNet":
+        {
+            "limit": 500
+        },
+        "DailyUploads":
+        {
+            "limit": 200
+        },
+        "SolidFiles":
+        {
+            "limit": 500
+        },
+        "AnonFiles":
+        {
+            "limit": 500
+        },
+        "GoFileIo":
+        {
+            "limit": 500
+        },
+        "file-upload":
+        {
+            "limit": 500
+        },
+        "BayFiles":
+        {
+            "limit": 500
+        },
+        "TusFiles":
+        {
+            "limit": 500
+        },
+        "MixdropCo":
+        {
+            "limit": 500
+        },
+        "FilesIm":
+        {
+            "limit": 500
+        },
+        "DropApk":
+        {
+            "limit": 500
+        },
+        "ZippyShare":
+        {
+            "limit": 500
+        },
+        "dlupload":
+        {
+            "limit": 500
+        },
+        "UploadEe":
+        {
+            "limit": 100
+        },
+        "TurboBit":
+        {
+            "limit": 500
+        },
+        "UsersDrive":
+        {
+            "limit": 500
+        },
+        "DownloadGG":
+        {
+            "limit": 500
+        },
+        "OneFichier":
+        {
+            "limit": 500
+        },
+        "Uptobox":
+        {
+            "limit": 500
+        }
+    },
+    "multiup":
+    {
+        "filerio.in":
+        {
+            "limit": 2000
+        },
+        "drop.download":
+        {
+            "limit": 5000
+        },
+        "download.gg":
+        {
+            "limit": 25000
+        },
+        "uppit.com":
+        {
+            "limit": 1000
+        },
+        "uploadbox.io":
+        {
+            "limit": 524
+        }
+    },
+    "other":
+    {
+        "filepizza":
+        {
+            "limit": 1.0E+11
+        },
+        "usaupload":
+        {
+            "limit": 1000
+        },
+        "filesharego":
+        {
+            "limit": 5000
+        },
+        "expirebox":
+        {
+            "limit": 200
+        },
+        "filepost":
+        {
+            "limit": 3000
+        }
+    }
+}
