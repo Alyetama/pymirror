@@ -30,10 +30,6 @@ def main(**kwargs):
                         action='help',
                         default=argparse.SUPPRESS,
                         help='Show this help message and exit')
-    parser.add_argument('-v',
-                        '--version',
-                        action='version',
-                        version=f'%(prog)s {__version__}')
     parser.add_argument('-i',
                         '--input',
                         help='Path to the input file/folder',
@@ -72,6 +68,10 @@ def main(**kwargs):
         help='Show logs and save it to a file (default: False)',
         action='store_true',
         default=False)
+    parser.add_argument('-v',
+                        '--version',
+                        action='version',
+                        version=f'%(prog)s {__version__}')
 
     args = parser.parse_args()
 
