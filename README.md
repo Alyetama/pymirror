@@ -11,15 +11,15 @@ $ pip install pymirror
 ## CLI Arguments
 ```bash
 $ pymirror --help
-usage: pymirror [-h] [-i INPUT] [-s {lines,list,markdown,reddit}] [-m]
-                [-n NUMBER] [-d] [-c] [-l]
+usage: pymirror [-h] -i INPUT [-s {lines,list,markdown,reddit}] [-m] [-n NUMBER]
+                [-d] [-c] [--debug] [-l] [-e] [-v]
 
 optional arguments:
   -h, --help                            Show this help message and exit
   -i, --input INPUT                     Path to the input file/folder
   -s, --style {lines,list,markdown,reddit}
                                         Output style (default: lines)
-  -m, --more-links                      Uses Selenium to generate more links 
+  -m, --more-links                      Use mirrored.to to generate more likes
                                         (default: False)
   -n, --number NUMBER                   Select a specific number of servers to
                                         use (default: max)
@@ -27,8 +27,12 @@ optional arguments:
                                         complete (default: False)
   -c, --check-status                    Check the status of the remote servers
                                         (default: False)
-  -l, --log                             Log the current uploadto a file
+  --debug                               Debug
+  -l, --log                             Show logs and save it to a file
                                         (default: False)
+  -e, --experimental                    Generate even more links (experimental)
+                                        (default: False)
+  -v, --version                         Show version number and exit
 ```
 
 ## Basic Usage
