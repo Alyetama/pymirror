@@ -5,9 +5,9 @@ Icon?
 *.log
 *.xpi
 /.idea/
-*/.wdm/
+/.wdm/
 foo.txt
-test_*
+pymirror/.addons/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

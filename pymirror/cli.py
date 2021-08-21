@@ -1,7 +1,9 @@
+#!/usr/bin/env python3
+# coding: utf-8
+
 import argparse
 
 from .__init__ import __version__
-from .pymirror import PyMirror, FirefoxInterrupt, pids
 
 
 class CustomHelpFormatter(argparse.HelpFormatter):
@@ -10,7 +12,7 @@ class CustomHelpFormatter(argparse.HelpFormatter):
 
     def _format_action_invocation(self, action):
         if not action.option_strings or action.nargs == 0:
-            return super()._format_action_invocation(action)
+            return super()._format_action_invocation(action)  # noqa
         default = self._get_default_metavar_for_optional(action)
         args_string = self._format_args(action, default)
         return ', '.join(action.option_strings) + ' ' + args_string
@@ -20,10 +22,9 @@ def fmt(prog):
     return CustomHelpFormatter(prog)
 
 
-def main(**kwargs):
-
-    parser = argparse.ArgumentParser(prog='pymirror',
-                                     formatter_class=fmt,
+def cli():
+    # noinspection PyTypeChecker
+    parser = argparse.ArgumentParser(prog='pymirror', formatter_class=fmt,
                                      add_help=False)
     parser.add_argument('-h',
                         '--help',
@@ -63,9 +64,20 @@ def main(**kwargs):
         action='store_false',
         default=False)
     parser.add_argument(
+        '--debug',
+        help='Debug',
+        action='store_true',
+        default=False)
+    parser.add_argument(
         '-l',
         '--log',
         help='Show logs and save it to a file (default: False)',
+        action='store_true',
+        default=False)
+    parser.add_argument(
+        '-e',
+        '--experimental',
+        help='Generate even more links (experimental) (default: False)',
         action='store_true',
         default=False)
     parser.add_argument('-v',
@@ -73,13 +85,6 @@ def main(**kwargs):
                         action='version',
                         version=f'%(prog)s {__version__}')
 
+
     args = parser.parse_args()
-
-    mirror = PyMirror().uploader(args)
-
-
-if __name__ == '__main__':
-    try:
-        main()
-    except Exception:
-        FirefoxInterrupt.firefoxInterrupt(pids)
+    return args

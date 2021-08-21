@@ -1,131 +1,107 @@
 {
-    "fileio":
-    {
-        "server": "https://file.io",
-        "keys":
-        [
-            "link"
-        ],
-        "flags": "-sF",
-        "parameter": "file=@",
-        "limit": 100
-    },
-    "gofile":
-    {
-        "server": "https://srv-store2.gofile.io/uploadFile",
-        "keys":
-        [
-            "data",
-            "downloadPage"
-        ],
-        "flags": "-sF",
-        "parameter": "file=@",
-        "limit": 1.0E+11
-    },
-    "uguu":
-    {
-        "server": "https://uguu.se/upload.php",
-        "keys":
-        [
-            "files",
-            0,
-            "url"
-        ],
-        "flags": "-sF",
-        "parameter": "files[]=@",
-        "limit": 134
-    },
-    "transfersh":
-    {
-        "server": "https://transfer.sh",
-        "keys":
-        [],
-        "flags": "-sF",
-        "parameter": "file=@",
-        "limit": 10000
-    },
-    "oshi":
-    {
-        "server": "https://oshi.at",
-        "keys":
-        [],
-        "flags": "-sF",
-        "parameter": "files[]=@",
-        "limit": 5000
-    },
-    "0x0":
-    {
-        "server": "https://0x0.st",
-        "keys":
-        [],
-        "flags": "-sF",
-        "parameter": "file=@",
-        "limit": 536
-    },
-    "ttm":
-    {
-        "server": "https://ttm.sh",
-        "keys":
-        [],
-        "flags": "-sF",
-        "parameter": "file=@",
-        "limit": 268
-    },
-    "filepush":
-    {
-        "server": "https://filepush.co/upload/",
-        "keys":
-        [],
-        "flags": "-s --upload-file",
-        "parameter": "",
-        "limit": 32
-    },
-    "tempsh":
-    {
-        "server": "https://temp.sh",
-        "keys":
-        [],
-        "flags": "-sT",
-        "parameter": "",
-        "limit": 2000
-    },
-    "fileditch":
-    {
-        "server": "https://up1.fileditch.com/upload.php",
-        "keys":
-        [
-            "files",
-            0,
-            "url"
-        ],
-        "flags": "-sF",
-        "parameter": "files[]=@",
-        "limit": 15000
-    },
-    "pomflainla":
-    {
-        "server": "https://pomf.lain.la/upload.php",
-        "keys":
-        [
-            "files",
-            0,
-            "url"
-        ],
-        "flags": "-sF",
-        "parameter": "files[]=@",
-        "limit": 536
-    },
-    "midi":
-    {
-        "server": "https://midi.moe/upload.php",
-        "keys":
-        [
-            "files",
-            0,
-            "url"
-        ],
-        "flags": "-sF",
-        "parameter": "files[]=@",
-        "limit": 209
-    }
+  "fileio": {
+    "server": "https://file.io",
+    "keys": [
+      "link"
+    ],
+    "flags": "-sF",
+    "parameter": "file=@",
+    "limit": 100
+  },
+  "gofile": {
+    "server": "https://srv-store2.gofile.io/uploadFile",
+    "keys": [
+      "data",
+      "downloadPage"
+    ],
+    "flags": "-sF",
+    "parameter": "file=@",
+    "limit": 1.0E+11
+  },
+  "uguu": {
+    "server": "https://uguu.se/upload.php",
+    "keys": [
+      "files",
+      0,
+      "url"
+    ],
+    "flags": "-sF",
+    "parameter": "files[]=@",
+    "limit": 134
+  },
+  "transfersh": {
+    "server": "https://transfer.sh",
+    "keys": [],
+    "flags": "-sF",
+    "parameter": "file=@",
+    "limit": 10000
+  },
+  "oshi": {
+    "server": "https://oshi.at",
+    "keys": [],
+    "flags": "-sF",
+    "parameter": "files[]=@",
+    "limit": 5000
+  },
+  "0x0": {
+    "server": "https://0x0.st",
+    "keys": [],
+    "flags": "-sF",
+    "parameter": "file=@",
+    "limit": 536
+  },
+  "ttm": {
+    "server": "https://ttm.sh",
+    "keys": [],
+    "flags": "-sF",
+    "parameter": "file=@",
+    "limit": 268
+  },
+  "filepush": {
+    "server": "https://filepush.co/upload/",
+    "keys": [],
+    "flags": "-s --upload-file",
+    "parameter": "",
+    "limit": 32
+  },
+  "tempsh": {
+    "server": "https://temp.sh",
+    "keys": [],
+    "flags": "-sT",
+    "parameter": "",
+    "limit": 2000
+  },
+  "fileditch": {
+    "server": "https://up1.fileditch.com/upload.php",
+    "keys": [
+      "files",
+      0,
+      "url"
+    ],
+    "flags": "-sF",
+    "parameter": "files[]=@",
+    "limit": 15000
+  },
+  "pomflainla": {
+    "server": "https://pomf.lain.la/upload.php",
+    "keys": [
+      "files",
+      0,
+      "url"
+    ],
+    "flags": "-sF",
+    "parameter": "files[]=@",
+    "limit": 536
+  },
+  "midi": {
+    "server": "https://midi.moe/upload.php",
+    "keys": [
+      "files",
+      0,
+      "url"
+    ],
+    "flags": "-sF",
+    "parameter": "files[]=@",
+    "limit": 209
+  }
 }

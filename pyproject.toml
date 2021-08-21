@@ -21,4 +21,4 @@ dependencies = [
 Home = "https://github.com/Alyetama/pymirror"
 
 [project.scripts]
-pymirror = "pymirror.cli:main"
+pymirror = "pymirror.run:main"
