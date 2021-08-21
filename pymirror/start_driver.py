@@ -24,7 +24,6 @@ class StartDrive:
 
     @staticmethod
     def download_ublock() -> None:
-        print(Path(Config.UBLOCK).parent)
         Path(Path(Config.UBLOCK).parent).mkdir(exist_ok=True)
         latest = 'https://addons.mozilla.org/firefox/downloads/file/3806442'
         os.popen(f'curl -sLo "{Config.UBLOCK}"'
