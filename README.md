@@ -1,21 +1,24 @@
 # PyMirror
 
 ## Requirements
+
 - [Firefox Browser](https://www.mozilla.org/en-US/firefox/new/) (optional)
 
 ## Installation
+
 ```bash
 $ pip install pymirror
 ```
 
 ## CLI Arguments
+
 ```bash
 $ pymirror --help
 usage: pymirror [-h] -i INPUT [-s {lines,list,markdown,reddit}] [-m] [-n NUMBER]
-                [-d] [-c] [--debug] [-l] [-e] [-v]
+                [-d] [-c] [-D] [-l] [-e] [-v]
 
 optional arguments:
-  -h, --help                            Show this help message and exit
+  -h, --help                            Show this help message and \exit
   -i, --input INPUT                     Path to the input file/folder
   -s, --style {lines,list,markdown,reddit}
                                         Output style (default: lines)
@@ -27,21 +30,24 @@ optional arguments:
                                         complete (default: False)
   -c, --check-status                    Check the status of the remote servers
                                         (default: False)
-  --debug                               Debug
+  -D, --debug                           Debug
   -l, --log                             Show logs and save it to a file
                                         (default: False)
   -e, --experimental                    Generate even more links (experimental)
                                         (default: False)
-  -v, --version                         Show version number and exit
+  -v, --version                         Show program\'s version number and \exit
 ```
 
 ## Basic Usage
+
 ```bash
 $ pymirror --input foo.txt
 ```
 
 ## Examaples
+
 1. Upload a file to multiple free hosting services and return the output in a markdown style
+
 ```bash
 0:00:00 | ~/Desktop  | $ pymirror --input foo.txt --style markdown
 Press `CTRL+C` at any time to quit.
@@ -69,9 +75,12 @@ Press `CTRL+C` at any time to quit.
 - [fileditch](https://pomf.lain.la/f/ibie9ed.txt)
 ───────────────────────────────────── END ──────────────────────────────────────
 ```
+
 - View on [asciinema](https://asciinema.org/a/Rg1w7TPrjw9RBi7QTowr9158D?t=3)
 
-2. Use the `--more-links` (`-m`) flag<sup>1</sup> to upload to more hosting services (~ 25 more) utilizing Selenium<sup>2</sup>
+2. Use the `--more-links` (`-m`) flag<sup>1</sup> to upload to more hosting services (~ 25 more) utilizing Selenium<sup>
+   2</sup>
+
 ```bash
 0:00:00 | ~/Desktop  | $ pymirror --input foo.txt --style markdown --more-links
 Press `CTRL+C` at any time to quit.
@@ -139,9 +148,11 @@ Press `CTRL+C` at any time to quit.
 ...and more!
 ───────────────────────────────────── END ──────────────────────────────────────
 ```
+
 <sup>1</sup>Requires Firefox<br>
 <sup>2</sup>A temporary Gecko driver will be installed automatically if it does not already exist
 
 ## To do
+
 - [ ] Filter servers by upload limit
 

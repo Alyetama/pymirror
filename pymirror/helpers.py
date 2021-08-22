@@ -3,8 +3,8 @@
 import inspect
 
 import loguru
-from rich.console import Console
 import selenium.common.exceptions
+from rich.console import Console
 
 
 class Shared:

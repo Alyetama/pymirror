@@ -23,11 +23,11 @@ from dracula import DraculaPalette as Dp
 from rich.panel import Panel
 
 from .config import Config
+from .experimental.more_links import MoreLinks
 from .handlers import KeyboardInterruptHandler
 from .helpers import Shared, console, logger
 from .mirroredto import Mirroredto
 from .multiup import MultiUp
-from .experimental.more_links import MoreLinks
 
 
 class PyMirror:
@@ -202,7 +202,8 @@ class PyMirror:
                       KeyboardInterruptHandler.keyboardInterruptHandler)
 
         if args.experimental and not args.more_links:
-            raise Exception('You need to add the `--more-links` flag to use `--experimental`')
+            raise Exception(
+                'You need to add the `--more-links` flag to use `--experimental`')
 
         with open(f'{Config.DATA_PATH}/servers_data.json') as j:
             data = json.load(j)

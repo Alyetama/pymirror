@@ -64,6 +64,7 @@ def cli():
         action='store_false',
         default=False)
     parser.add_argument(
+        '-D',
         '--debug',
         help='Debug',
         action='store_true',
@@ -84,7 +85,6 @@ def cli():
                         '--version',
                         action='version',
                         version=f'%(prog)s {__version__}')
-
 
     args = parser.parse_args()
     return args
