@@ -3,6 +3,8 @@
 
 import os
 import platform
+import shlex
+import subprocess
 import time
 from pathlib import Path
 from typing import Any
@@ -14,8 +16,7 @@ from selenium.webdriver.firefox.options import Options
 from webdriver_manager.firefox import GeckoDriverManager
 
 from .config import Config
-from .handlers import SeleniumExceptionInfo
-from .helpers import Shared, console
+from .helpers import Shared, console, selenium_exceptions
 
 
 class StartDrive:
@@ -26,14 +27,19 @@ class StartDrive:
     def download_ublock() -> None:
         Path(Path(Config.UBLOCK).parent).mkdir(exist_ok=True)
         latest = 'https://addons.mozilla.org/firefox/downloads/file/3806442'
-        os.popen(f'curl -sLo "{Config.UBLOCK}"'
-                 f' {latest}').read()
+        p = subprocess.Popen(
+            shlex.split(f'curl -sLo "{Config.UBLOCK}" {latest}'),
+            stdout=subprocess.PIPE,
+            shell=False
+        )
+        p.communicate()
         console.print(
             '\nYou\'re running the "--more-links" flag '
             'for the first time. Please wait until everything is ready. '
             'This is a one-time thing.\n',
             style='#f1fa8c')
-        assert Path(Config.UBLOCK).exists()
+        if not Path(Config.UBLOCK).exists():
+            raise AssertionError
 
     def start_driver(self, headless: bool = True):
         if not Path(Config.UBLOCK).exists():
@@ -67,12 +73,11 @@ class StartDrive:
                         'You will need to build gecko driver for ARM: '
                         'https://firefox-source-docs.mozilla.org/testing/'
                         'geckodriver/ARM.html')
-        except Exception as se:
-            console.print(SeleniumExceptionInfo(se))
-            console.print(f'[{Dp.b}]{__file__}[{Dp.b}] [{Dp.y}]raised '
-                          f'unexpected '
-                          f'issue! '
+        except selenium_exceptions as se:
+            console.print(f'[{Dp.b}]{__file__}[{Dp.b}] '
+                          f'[{Dp.y}]raised an unexpected issue! '
                           'Try again or remove the `--more-links` flag')
+            raise se
 
         ublock_exists = False
         driver.install_addon(Config.UBLOCK, temporary=True)  # noqa
@@ -85,7 +90,8 @@ class StartDrive:
             for cell in cells:
                 if 'uBlock' in cell.text:
                     ublock_exists = True
-        assert ublock_exists
+        if not ublock_exists:
+            raise AssertionError
 
         capabilities = driver.capabilities
         pid = capabilities['moz:processID']

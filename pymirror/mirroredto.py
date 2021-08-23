@@ -10,6 +10,7 @@ from dracula import DraculaPalette as Dp
 from loguru import logger
 from selenium.webdriver.common.keys import Keys
 
+from . import Namespace
 from .config import Config
 from .handlers import SeleniumExceptionInfo
 from .helpers import Shared, console, logger, selenium_exceptions
@@ -17,13 +18,12 @@ from .start_driver import StartDrive
 
 
 class Mirroredto:
-    def __init__(self, args, file: str):
+    def __init__(self, args: Namespace):
         self.args = args
-        self.file = file
 
     def _mirroredto(self, drivers: list) -> list:
         def process(driver, batch):
-            file_size = Path(self.file).stat().st_size / 1e+6
+            file_size = Path(self.args.input).stat().st_size / 1e+6
             with open(f'{Config.DATA_PATH}/more_links.json') as j:
                 more_links = json.load(j)
 
@@ -33,8 +33,7 @@ class Mirroredto:
                 if self.args.number:
                     if local_limit >= int(self.args.number):
                         return
-                    else:
-                        local_limit += 1
+                    local_limit += 1
                 time.sleep(2)
                 driver.get('https://www.mirrored.to/')
                 time.sleep(5)
@@ -48,7 +47,7 @@ class Mirroredto:
                         elif more_links['mirroredto'][x]['limit'] \
                                 > file_size:
                             driver.find_element_by_id(x.lower()).click()
-                    except Exception as e:
+                    except selenium_exceptions as e:
                         console.print(SeleniumExceptionInfo(e))
                         continue
 
@@ -56,7 +55,7 @@ class Mirroredto:
                 driver.find_element_by_css_selector(
                     '#uploadifive-html_file_upload > '
                     'input[type=file]:nth-child(3)'
-                ).send_keys(self.file)
+                ).send_keys(self.args.input)
                 time.sleep(1)
 
                 driver.find_element_by_id('upload_button').click()

@@ -10,25 +10,30 @@ from typing import Union, Optional
 
 from dracula import DraculaPalette as Dp
 
+from . import Namespace
 from .config import Config
 from .helpers import Shared, console
 from .start_driver import StartDrive
 
 
 class MultiUp:
-    def __init__(self, args, file):
+    def __init__(self, args: Namespace):
         self.args = args
-        self.file = file
 
     def _multiup(self, driver) -> Optional[list]:
         def cURL_request(url: str) -> Union[None, dict]:
             cURL = shlex.split(url)
-            out = subprocess.run(cURL, stdout=subprocess.PIPE)
+            try:
+                out = subprocess.run(cURL, stdout=subprocess.PIPE, check=True)
+            except subprocess.CalledProcessError:
+                console.print(f'{Dp.r}Encountered an unexpected issue with '
+                              'multiup')
+                return
             res = out.stdout.decode('UTF-8').replace('\\', '')
             try:
                 res = json.loads(res)
-            except json.JSONDecodeError:
-                res = None
+            except json.JSONDecodeError as error:
+                raise error
             return res
 
         multiup_links = []
@@ -44,12 +49,11 @@ class MultiUp:
             'uploadbox.io'
         ]
         limit_n = len(Shared.all_links)
-        file_size = Path(self.file).stat().st_size / 1e+6
+        file_size = Path(self.args.input).stat().st_size / 1e+6
         for x in selected_hosts_lst:
-            if self.args.number:
-                if int(self.args.number) <= limit_n:
-                    selected_hosts_lst.remove(x)
-                    continue
+            if self.args.number and int(self.args.number) <= limit_n:
+                selected_hosts_lst.remove(x)
+                continue
             if file_size > more_links['multiup'][x]['limit']:
                 selected_hosts_lst.remove(x)
             else:
@@ -64,9 +68,10 @@ class MultiUp:
         selected_hosts = ' '.join(
             [f'-F {x}=true' for x in selected_hosts_lst])
         upload = cURL_request(
-            f'curl -{s}F "files[]=@{self.file}" {selected_hosts} {server}')
+            f'curl -{s}F "files[]=@{self.args.input}" {selected_hosts}'
+            f'{server}')
         if len(upload['files']) == 0:
-            upload = cURL_request(f'curl -{s}F "files[]=@{self.file}" '
+            upload = cURL_request(f'curl -{s}F "files[]=@{self.args.input}" '
                                   f'{server}')
         link = upload['files'][0]['url'].replace(
             'download', 'en/mirror')
@@ -88,9 +93,7 @@ class MultiUp:
                 i += 1
             else:
                 j += 1
-            if j > i + 10:
-                break
-            elif len(elements) == len(selected_hosts_lst) + 1:
+            if (j > i + 10) or (len(elements) == len(selected_hosts_lst) + 1):
                 break
 
         for e in elements:

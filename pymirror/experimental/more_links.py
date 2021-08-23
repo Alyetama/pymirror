@@ -124,10 +124,12 @@ class MoreLinks:
             MoreLinks(*args_).filepost
         ]
 
-        if self.args.number:
-            if int(self.args.number) < len(Shared.all_links) + 5:
-                left = int(self.args.number) - len(Shared.all_links)
-                hosts = hosts[:left]
+        if (
+                self.args.number
+                and int(self.args.number) < len(Shared.all_links) + 5
+        ):
+            left = int(self.args.number) - len(Shared.all_links)
+            hosts = hosts[:left]
 
         with concurrent.futures.ThreadPoolExecutor() as executor:
             urls = []

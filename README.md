@@ -154,5 +154,4 @@ Press `CTRL+C` at any time to quit.
 
 ## To do
 
-- [ ] Filter servers by upload limit
-
+- [x] ~~Filter servers by upload limit~~

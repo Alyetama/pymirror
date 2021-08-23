@@ -4,7 +4,7 @@ build-backend = "flit_core.buildapi"
 
 [project]
 name = "pymirror"
-authors = [{name = "Alyetama", email = "56323389+Alyetama@users.noreply.github.com"}]
+authors = [{ name = "Alyetama", email = "56323389+Alyetama@users.noreply.github.com" }]
 readme = "README.md"
 classifiers = ["License :: OSI Approved :: MIT License"]
 dynamic = ["version", "description"]

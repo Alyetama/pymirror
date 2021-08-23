@@ -10,7 +10,7 @@ from .main import PyMirror
 
 def main():
     args = cli()
-    PyMirror().uploader(args)
+    PyMirror(args).uploader()
 
 
 if __name__ == '__main__':
