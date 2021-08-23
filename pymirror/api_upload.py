@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # coding: utf-8
 
+import argparse
 import json
 import mimetypes
 import platform
@@ -14,7 +15,6 @@ from typing import Optional, Generator
 
 from dracula import DraculaPalette as Dp
 
-from . import Namespace
 from .handlers import custom_error_traceback
 from .helpers import Shared, logger, console
 
@@ -23,8 +23,8 @@ class Error(Exception):
     pass
 
 
-class APIUploads:
-    def __init__(self, data: dict, args: Namespace) -> None:
+class APIUpload:
+    def __init__(self, data: dict, args: argparse.Namespace) -> None:
         self.data = data
         self.args = args
 

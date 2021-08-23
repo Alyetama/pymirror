@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # coding: utf-8
 
+import argparse
 import inspect
 import json
 import re
@@ -55,3 +56,4 @@ def load_data():
 console = Console()
 logger = logger()
 selenium_exceptions = selenium_exceptions_classes()
+Namespace = argparse.Namespace

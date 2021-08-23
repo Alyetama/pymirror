@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # coding: utf-8
 
+import argparse
 import concurrent.futures
 import time
 from pathlib import Path
@@ -13,11 +14,11 @@ from ..start_driver import StartDrive
 
 
 class MoreLinks:
-    def __init__(self, args, file: str) -> None:
-        self.file = file
+    def __init__(self, args: argparse.Namespace) -> None:
         self.args = args
+        self.file = str(Path(self.args.input).resolve())
         self.driver = StartDrive(None).start_driver()
-        self.file_size = Path(self.file).stat().st_size / 1e+6
+        self.file_size = Path(self.args.input).stat().st_size / 1e+6
         self.headless = True
 
     def usaupload(self) -> Optional[str]:
@@ -114,14 +115,12 @@ class MoreLinks:
         return link
 
     def upload(self):
-        args_ = self.args, self.file
-
         hosts = [
-            MoreLinks(*args_).filepizza,
-            MoreLinks(*args_).usaupload,
-            MoreLinks(*args_).filesharego,
-            MoreLinks(*args_).expirebox,
-            MoreLinks(*args_).filepost
+            MoreLinks(self.args).filepizza,
+            MoreLinks(self.args).usaupload,
+            MoreLinks(self.args).filesharego,
+            MoreLinks(self.args).expirebox,
+            MoreLinks(self.args).filepost
         ]
 
         if (

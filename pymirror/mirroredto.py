@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # coding: utf-8
 
+import argparse
 import concurrent.futures
 import json
 import time
@@ -10,7 +11,6 @@ from dracula import DraculaPalette as Dp
 from loguru import logger
 from selenium.webdriver.common.keys import Keys
 
-from . import Namespace
 from .config import Config
 from .handlers import SeleniumExceptionInfo
 from .helpers import Shared, console, logger, selenium_exceptions
@@ -18,7 +18,7 @@ from .start_driver import StartDrive
 
 
 class Mirroredto:
-    def __init__(self, args: Namespace):
+    def __init__(self, args: argparse.Namespace):
         self.args = args
 
     def _mirroredto(self, drivers: list) -> list:
@@ -52,10 +52,11 @@ class Mirroredto:
                         continue
 
                 time.sleep(2)
+                resolved_file = str(Path(self.args.input).resolve())
                 driver.find_element_by_css_selector(
                     '#uploadifive-html_file_upload > '
                     'input[type=file]:nth-child(3)'
-                ).send_keys(self.args.input)
+                ).send_keys(resolved_file)
                 time.sleep(1)
 
                 driver.find_element_by_id('upload_button').click()

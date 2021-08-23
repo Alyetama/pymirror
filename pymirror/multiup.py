@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # coding: utf-8
 
+import argparse
 import json
 import shlex
 import subprocess
@@ -10,14 +11,13 @@ from typing import Union, Optional
 
 from dracula import DraculaPalette as Dp
 
-from . import Namespace
 from .config import Config
 from .helpers import Shared, console
 from .start_driver import StartDrive
 
 
 class MultiUp:
-    def __init__(self, args: Namespace):
+    def __init__(self, args: argparse.Namespace):
         self.args = args
 
     def _multiup(self, driver) -> Optional[list]:
@@ -69,7 +69,7 @@ class MultiUp:
             [f'-F {x}=true' for x in selected_hosts_lst])
         upload = cURL_request(
             f'curl -{s}F "files[]=@{self.args.input}" {selected_hosts}'
-            f'{server}')
+            f' {server}')
         if len(upload['files']) == 0:
             upload = cURL_request(f'curl -{s}F "files[]=@{self.args.input}" '
                                   f'{server}')

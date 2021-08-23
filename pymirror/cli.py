@@ -3,7 +3,6 @@
 
 import argparse
 
-from . import Namespace
 from .__init__ import __version__
 
 
@@ -23,7 +22,7 @@ def fmt(prog):
     return CustomHelpFormatter(prog)
 
 
-def cli() -> Namespace:
+def cli() -> argparse.Namespace:
     # noinspection PyTypeChecker
     parser = argparse.ArgumentParser(prog='pymirror', formatter_class=fmt,
                                      add_help=False)

@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 # coding: utf-8
 
+import argparse
 import json
-import multiprocessing as mp
+import multiprocessing
 import os
 import shutil
 import signal
@@ -16,8 +17,7 @@ from typing import Union, NoReturn
 from dracula import DraculaPalette as Dp
 from rich.panel import Panel
 
-from . import Namespace
-from .api_upload import APIUploads
+from .api_upload import APIUpload
 from .config import Config
 from .experimental.more_links import MoreLinks
 from .handlers import KeyboardInterruptHandler
@@ -27,7 +27,7 @@ from .multiup import MultiUp
 
 
 class PyMirror:
-    def __init__(self, args: Namespace) -> None:
+    def __init__(self, args: argparse.Namespace) -> None:
         self.args = args
         self.data = load_data()
 
@@ -92,9 +92,9 @@ class PyMirror:
         if self.args.check_status:
             console.rule('Checking servers status...')
             ips = self.return_ips()
-            cpus = mp.cpu_count() - 1
-            with mp.Pool(cpus, initializer=self.initializer) as p:
-                responses = p.map(APIUploads.ping, ips)
+            cpus = multiprocessing.cpu_count() - 1
+            with multiprocessing.Pool(cpus, initializer=self.initializer) as p:
+                responses = p.map(APIUpload.ping, ips)
         else:
             responses = []
 
@@ -111,14 +111,13 @@ class PyMirror:
         if len(responses) == 0:
             responses = [True] * len(data.keys())
 
-        APIUploads(self.data, self.args).api_uploads(responses)
+        APIUpload(self.data, self.args).api_uploads(responses)
 
         if self.args.more_links:
-            file_resolved = str(Path(file).resolve())
             Mirroredto(self.args).upload()
             MultiUp(self.args).upload()
             if self.args.experimental:
-                MoreLinks(self.args, file_resolved).upload()
+                MoreLinks(self.args).upload()
 
         links_dict = {}
         for link in Shared.all_links:
