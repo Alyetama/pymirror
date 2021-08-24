@@ -74,5 +74,6 @@ class _Config:
         return speed / 8e+6
 
 
+_Config().__call__()
 _config = _Config().get_dict()
 Config = _config
