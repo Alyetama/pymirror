@@ -55,10 +55,12 @@ class PyMirror:
 
     def style_output(
             self,
-            links_list: Union[list, str] = Shared.all_links
+            links_list: Union[list, str] = None
     ) -> Union[list, str]:
         if isinstance(links_list, str):
             links_list = [x for x in links_list.split('\n') if x != '']
+        if links_list is None:
+            links_list = Shared.all_links
         links_dict = {}
         for link in links_list:
             try:
