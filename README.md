@@ -1,22 +1,23 @@
 # PyMirror
 
-
 [![DeepSource](https://static.deepsource.io/deepsource-badge-light-mini.svg)](https://deepsource.io/gh/Alyetama/pymirror/?ref=repository-badge) [![PyPI](https://img.shields.io/pypi/v/pymirror)](https://pypi.org/project/pymirror/) ![PyPI - Downloads](https://img.shields.io/pypi/dm/pymirror) [![PEP8](https://img.shields.io/badge/code%20style-pep8-green.svg)](https://www.python.org/dev/peps/pep-0008/)
 
 ## Requirements
 
-- [Firefox Browser](https://www.mozilla.org/en-US/firefox/new/) (optional)
+-  [Firefox Browser](https://www.mozilla.org/en-US/firefox/new/) (optional)
 
 ## Installation
 
 ```bash
-$ pip install pymirror
+pip install pymirror
 ```
 
 ## CLI Arguments
 
 ```bash
-$ pymirror --help
+pymirror --help
+```
+```
 usage: pymirror [-h] -i INPUT [-s {lines,list,markdown,reddit}] [-m] [-n NUMBER]
                 [-d] [-c] [-D] [-l] [-e] [-v]
 
@@ -44,7 +45,7 @@ optional arguments:
 ## Basic Usage
 
 ```bash
-$ pymirror --input foo.txt
+pymirror --input foo.txt
 ```
 
 ## Examaples
@@ -52,7 +53,9 @@ $ pymirror --input foo.txt
 1. Upload a file to multiple free hosting services and return the output in a markdown style
 
 ```bash
-0:00:00 | ~/Desktop  | $ pymirror --input foo.txt --style markdown
+pymirror --input foo.txt --style markdown
+```
+```
 Press `CTRL+C` at any time to quit.
 ───────────────────────────────── Uploading... ─────────────────────────────────
 [ OK ] https://file.io/PYovv2JI0I4d
@@ -85,7 +88,9 @@ Press `CTRL+C` at any time to quit.
    2</sup>
 
 ```bash
-0:00:00 | ~/Desktop  | $ pymirror --input foo.txt --style markdown --more-links
+pymirror --input foo.txt --style markdown --more-links
+```
+```
 Press `CTRL+C` at any time to quit.
 ───────────────────────────────── Uploading... ─────────────────────────────────
 [ OK ] https://file.io/eDZG6VfnDN43
@@ -157,4 +162,4 @@ Press `CTRL+C` at any time to quit.
 
 ## To do
 
-- [x] ~~Filter servers by upload limit~~
+- [x]  ~~Filter servers by upload limit~~

@@ -31,14 +31,14 @@ class FirefoxInterruptHandler:
 
 class KeyboardInterruptHandler:
     def __init__(self) -> None:
-        self.firefox_handler = FirefoxInterruptHandler(Shared.pids)
+        pass  # noqa
 
     def keyboardInterruptHandler(self) -> NoReturn:
         sys.tracebacklimit = 0
         print('', end='\r')
         time.sleep(0.5)
         console.print(f'[{Dp.y}]Quitting...')
-        terminated = self.firefox_handler.firefoxInterrupt()
+        terminated = FirefoxInterruptHandler(Shared.pids).firefoxInterrupt()
         logger.info('Interrupted by the user.')
         if terminated:
             logger.info('Killed interrupted driver instances:', terminated)
