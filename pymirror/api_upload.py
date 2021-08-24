@@ -82,9 +82,9 @@ class APIUpload:
         keys = self.data[server]['keys']
         flags = self.data[server]['flags']
         parameter = self.data[server]['parameter']
-        cURL = f'curl {flags} "{parameter}{self.args.input}" {srv}'
-        cURL = shlex.split(cURL)
-        out = subprocess.run(cURL, stdout=subprocess.PIPE)
+        curl = f'curl {flags} "{parameter}{self.args.input}" {srv}'
+        curl = shlex.split(curl)
+        out = subprocess.run(curl, stdout=subprocess.PIPE)
         try:
             link = json.loads(out.stdout)
         except json.decoder.JSONDecodeError:
@@ -116,10 +116,10 @@ class APIUpload:
                 if not link:
                     continue
                 if (
-                    'bad gateway' in link.lower()
-                    or 'error' in link.lower()
-                    or 'https://' not in link.lower()
-                    ):
+                        'bad gateway' in link.lower()
+                        or 'error' in link.lower()
+                        or 'https://' not in link.lower()
+                ):
                     continue
                 console.print(f'[[{Dp.g}] OK [/{Dp.g}]]', link)
                 Shared.all_links.append(link)

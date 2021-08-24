@@ -20,7 +20,7 @@ from rich.panel import Panel
 from .api_upload import APIUpload
 from .config import Config
 from .experimental.more_links import MoreLinks
-from .handlers import KeyboardInterruptHandler
+from .handlers import keyboardInterruptHandler
 from .helpers import Shared, console, logger, load_data
 from .mirroredto import Mirroredto
 from .multiup import MultiUp
@@ -53,7 +53,24 @@ class PyMirror:
             ips.append((ip, k))
         return ips
 
-    def style_output(self, links_dict: dict) -> Union[list, str]:
+    def style_output(
+            self,
+            links_list: Union[list, str] = Shared.all_links
+    ) -> Union[list, str]:
+        if isinstance(links_list, str):
+            links_list = [x for x in links_list.split('\n') if x != '']
+        links_dict = {}
+        for link in links_list:
+            try:
+                domain = link.split('/')[:-1][2].replace('www.', '')
+                name = '.'.join(domain.split('.')[0:])
+                if len(name) == 1:
+                    name = '.'.join(domain.split('.')[1:])
+                elif len(name.split('.')) == 3:
+                    name = '.'.join(domain.split('.')[1:])
+                links_dict.update({name: link})
+            except IndexError:
+                continue
         names = list(links_dict.keys())
         links = list(links_dict.values())
         style = self.args.style
@@ -71,8 +88,7 @@ class PyMirror:
 
     def uploader(self) -> Union[list, str]:
         start_time = time.time()
-        signal.signal(signal.SIGINT,
-                      KeyboardInterruptHandler.keyboardInterruptHandler)
+        signal.signal(signal.SIGINT, keyboardInterruptHandler)
 
         if self.args.experimental and not self.args.more_links:
             raise Exception(
@@ -119,20 +135,7 @@ class PyMirror:
             if self.args.experimental:
                 MoreLinks(self.args).upload_to_all_()
 
-        links_dict = {}
-        for link in Shared.all_links:
-            try:
-                domain = link.split('/')[:-1][2].replace('www.', '')
-                name = '.'.join(domain.split('.')[0:])
-                if len(name) == 1:
-                    name = '.'.join(domain.split('.')[1:])
-                elif len(name.split('.')) == 3:
-                    name = '.'.join(domain.split('.')[1:])
-                links_dict.update({name: link})
-            except IndexError:
-                continue
-
-        output = self.style_output(links_dict)
+        output = self.style_output()
 
         if self.args.delete:
             if Path(self.args.input).is_dir():

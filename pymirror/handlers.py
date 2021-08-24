@@ -12,37 +12,29 @@ from dracula import DraculaPalette as Dp
 from .helpers import console, logger, Shared
 
 
-class FirefoxInterruptHandler:
-    def __init__(self, pids: list) -> None:
-        self.pids = pids
-
-    def firefoxInterrupt(self) -> list:
-        terminated = []
-        if self.pids:
-            for pid in self.pids:
-                try:
-                    p = psutil.Process(pid)
-                    p.terminate()
-                    terminated.append(pid)
-                except psutil.NoSuchProcess:
-                    continue
-        return terminated
+def firefoxInterrupt(pids) -> list:
+    terminated = []
+    if pids:
+        for pid in pids:
+            try:
+                p = psutil.Process(pid)
+                p.terminate()
+                terminated.append(pid)
+            except psutil.NoSuchProcess:
+                continue
+    return terminated
 
 
-class KeyboardInterruptHandler:
-    def __init__(self) -> None:
-        pass  # noqa
-
-    def keyboardInterruptHandler(self) -> NoReturn:
-        sys.tracebacklimit = 0
-        print('', end='\r')
-        time.sleep(0.5)
-        console.print(f'[{Dp.y}]Quitting...')
-        terminated = FirefoxInterruptHandler(Shared.pids).firefoxInterrupt()
-        logger.info('Interrupted by the user.')
-        if terminated:
-            logger.info('Killed interrupted driver instances:', terminated)
-        sys.exit(0)
+def keyboardInterruptHandler(*args) -> NoReturn:  # noqa
+    sys.tracebacklimit = 0
+    print('', end='\r')
+    time.sleep(0.5)
+    console.print(f'[{Dp.y}]Quitting...')
+    terminated = firefoxInterrupt(Shared.pids)
+    logger.info('Interrupted by the user.')
+    if terminated:
+        logger.info('Terminated interrupted Firefox instances:', terminated)
+    sys.exit(0)
 
 
 def SeleniumExceptionInfo(exception: Exception) -> str:

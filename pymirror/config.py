@@ -5,6 +5,7 @@ import configparser
 import uuid
 from pathlib import Path
 
+# noinspection PyPackageRequirements
 import speedtest
 
 

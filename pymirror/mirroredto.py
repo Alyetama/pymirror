@@ -94,12 +94,12 @@ class Mirroredto:
                 for handle in driver.window_handles:
                     driver.switch_to.window(handle)
                     try:
-                        LINK = driver.find_element_by_class_name(
+                        link = driver.find_element_by_class_name(
                             'code_wrap').text
-                        Shared.all_links.append(LINK)
-                        mirroredto_links.append(LINK)
-                        console.print(f'[[{Dp.g}] OK [/{Dp.g}]] {LINK}')
-                        logger.info(f'[ OK ] {LINK}')
+                        Shared.all_links.append(link)
+                        mirroredto_links.append(link)
+                        console.print(f'[[{Dp.g}] OK [/{Dp.g}]] {link}')
+                        logger.info(f'[ OK ] {link}')
                         if handle != current_window:
                             driver.close()
                     except selenium_exceptions:
@@ -110,7 +110,9 @@ class Mirroredto:
 
             finally:
                 driver.quit()
-
+                if self.args.debug:
+                    console.print(f'[{Dp.y}]Closed driver instance spawned '
+                                  f'in {__file__}')
             return mirroredto_links
 
         first_batch = [

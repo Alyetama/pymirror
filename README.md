@@ -4,7 +4,7 @@
 
 ## Requirements
 
--  [Firefox Browser](https://www.mozilla.org/en-US/firefox/new/) (optional)
+- [Firefox Browser](https://www.mozilla.org/en-US/firefox/new/) (optional)
 
 ## Installation
 
@@ -17,6 +17,7 @@ pip install pymirror
 ```bash
 pymirror --help
 ```
+
 ```
 usage: pymirror [-h] -i INPUT [-s {lines,list,markdown,reddit}] [-m] [-n NUMBER]
                 [-d] [-c] [-D] [-l] [-e] [-v]
@@ -55,6 +56,7 @@ pymirror --input foo.txt
 ```bash
 pymirror --input foo.txt --style markdown
 ```
+
 ```
 Press `CTRL+C` at any time to quit.
 ───────────────────────────────── Uploading... ─────────────────────────────────
@@ -90,6 +92,7 @@ Press `CTRL+C` at any time to quit.
 ```bash
 pymirror --input foo.txt --style markdown --more-links
 ```
+
 ```
 Press `CTRL+C` at any time to quit.
 ───────────────────────────────── Uploading... ─────────────────────────────────

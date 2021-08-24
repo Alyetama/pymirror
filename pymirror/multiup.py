@@ -22,9 +22,9 @@ class MultiUp:
 
     def _multiup(self, driver) -> Optional[list]:
         def cURL_request(url: str) -> Union[None, dict]:
-            cURL = shlex.split(url)
+            curl = shlex.split(url)
             try:
-                out = subprocess.run(cURL, stdout=subprocess.PIPE, check=True)
+                out = subprocess.run(curl, stdout=subprocess.PIPE, check=True)
             except subprocess.CalledProcessError:
                 console.print(f'{Dp.r}Encountered an unexpected issue with '
                               'multiup')
