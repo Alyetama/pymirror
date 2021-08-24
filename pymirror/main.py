@@ -121,13 +121,16 @@ class PyMirror:
 
         links_dict = {}
         for link in Shared.all_links:
-            domain = link.split('/')[:-1][2].replace('www.', '')
-            name = '.'.join(domain.split('.')[0:])
-            if len(name) == 1:
-                name = '.'.join(domain.split('.')[1:])
-            elif len(name.split('.')) == 3:
-                name = '.'.join(domain.split('.')[1:])
-            links_dict.update({name: link})
+            try:
+                domain = link.split('/')[:-1][2].replace('www.', '')
+                name = '.'.join(domain.split('.')[0:])
+                if len(name) == 1:
+                    name = '.'.join(domain.split('.')[1:])
+                elif len(name.split('.')) == 3:
+                    name = '.'.join(domain.split('.')[1:])
+                links_dict.update({name: link})
+            except IndexError:
+                continue
 
         output = self.style_output(links_dict)
 

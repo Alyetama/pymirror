@@ -115,7 +115,11 @@ class APIUpload:
                 link = self.curl(k)
                 if not link:
                     continue
-                if 'bad gateway' in link.lower() or 'error' in link.lower():
+                if (
+                    'bad gateway' in link.lower()
+                    or 'error' in link.lower()
+                    or 'https://' not in link.lower()
+                    ):
                     continue
                 console.print(f'[[{Dp.g}] OK [/{Dp.g}]]', link)
                 Shared.all_links.append(link)
