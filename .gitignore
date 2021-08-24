@@ -4,6 +4,7 @@
 Icon?
 *.log
 *.xpi
+*.ini
 /.idea/
 /.wdm/
 foo.txt

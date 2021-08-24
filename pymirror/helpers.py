@@ -5,6 +5,7 @@ import argparse
 import inspect
 import json
 import re
+from pathlib import Path
 
 import loguru
 import selenium.common.exceptions
@@ -48,9 +49,14 @@ def _match_links(links_raw: list) -> list:
 
 
 def load_data():
-    with open(f'{Config.DATA_PATH}/servers_data.json') as j:
+    with open(f"{Config.data_path}/servers_data.json") as j:  # noqa
         data = json.load(j)
     return data
+
+
+def download_time(file: str) -> float:
+    file_size = Path(file).stat().st_size / 1e+6
+    return file_size / float(Config['main']['upload_speed'])
 
 
 console = Console()

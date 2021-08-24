@@ -24,7 +24,7 @@ class Mirroredto:
     def _mirroredto(self, drivers: list) -> list:
         def process(driver, batch):
             file_size = Path(self.args.input).stat().st_size / 1e+6
-            with open(f'{Config.DATA_PATH}/more_links.json') as j:
+            with open(f'{Config.data_path}/more_links.json') as j:
                 more_links = json.load(j)
 
             local_limit = len(Shared.all_links)

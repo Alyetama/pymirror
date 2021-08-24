@@ -25,10 +25,10 @@ class StartDrive:
 
     @staticmethod
     def download_ublock() -> None:
-        Path(Path(Config.UBLOCK).parent).mkdir(exist_ok=True)
+        Path(Path(Config.ublock).parent).mkdir(exist_ok=True)
         latest = 'https://addons.mozilla.org/firefox/downloads/file/3806442'
         p = subprocess.Popen(
-            shlex.split(f'curl -sLo "{Config.UBLOCK}" {latest}'),
+            shlex.split(f'curl -sLo "{Config.ublock}" {latest}'),
             stdout=subprocess.PIPE,
             shell=False
         )
@@ -38,11 +38,11 @@ class StartDrive:
             'for the first time. Please wait until everything is ready. '
             'This is a one-time thing.\n',
             style='#f1fa8c')
-        if not Path(Config.UBLOCK).exists():
+        if not Path(Config.ublock).exists():
             raise AssertionError
 
     def start_driver(self, headless: bool = True):
-        if not Path(Config.UBLOCK).exists():
+        if not Path(Config.ublock).exists():
             self.download_ublock()
 
         options = Options()
@@ -80,7 +80,7 @@ class StartDrive:
             raise se
 
         ublock_exists = False
-        driver.install_addon(Config.UBLOCK, temporary=True)  # noqa
+        driver.install_addon(Config.ublock, temporary=True)  # noqa
         time.sleep(1)
         driver.get('about:support')
         body = driver.find_element_by_id('addons-tbody')

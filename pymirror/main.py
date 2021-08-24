@@ -79,12 +79,12 @@ class PyMirror:
                 'You need to add the `--more-links` flag to use '
                 '`--experimental`')
 
-        with open(f'{Config.DATA_PATH}/servers_data.json') as j:
+        with open(f'{Config.data_path}/servers_data.json') as j:
             data = json.load(j)
 
         if self.args.log:
             logger.remove()
-            logger.add(Config.LOG_FILE, level='DEBUG')
+            logger.add(Config.log_file, level='DEBUG')
             logger.add(sys.stderr, level='ERROR')
 
         console.print('Press `CTRL+C` at any time to quit.', style='#f1fa8c')
@@ -117,7 +117,7 @@ class PyMirror:
             Mirroredto(self.args).upload()
             MultiUp(self.args).upload()
             if self.args.experimental:
-                MoreLinks(self.args).upload()
+                MoreLinks(self.args).upload_to_all_()
 
         links_dict = {}
         for link in Shared.all_links:

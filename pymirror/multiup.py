@@ -38,7 +38,7 @@ class MultiUp:
 
         multiup_links = []
 
-        with open(f'{Config.DATA_PATH}/more_links.json') as j:
+        with open(f'{Config.data_path}/more_links.json') as j:
             more_links = json.load(j)
 
         server = cURL_request(
