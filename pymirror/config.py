@@ -64,7 +64,7 @@ class _Config:
 
     def get_dict(self) -> _Dict:
         self.config.read(self.file_name)
-        config_dict = {k: v for k, v in self.config['main'].items()}
+        config_dict = dict(self.config['main'].items())
         return _Dict(config_dict)
 
     @staticmethod
