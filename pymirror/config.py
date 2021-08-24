@@ -31,6 +31,7 @@ class _Config:
 
     def __call__(self) -> _MyConfigParser:
         if not Path(self.file_name).exists():
+            print('Creating a config file...')
             config = self.create_config()
             config.write2(self.file_name)
         else:
@@ -73,5 +74,5 @@ class _Config:
         return speed / 8e+6
 
 
-_config = _Config()
-Config = _config()
+_config = _Config().get_dict()
+Config = _config
