@@ -83,7 +83,7 @@ class MultiUp:
         elements = []
 
         while True:
-            time.sleep(1)
+            time.sleep(2)
             if es_len != len(elements):
                 j = 0
             driver.refresh()
@@ -113,5 +113,5 @@ class MultiUp:
                 cur_module=Path(__file__).name).start_driver(headless)
         else:
             driver = StartDrive(None).start_driver()
-        mirroredto_urls = self._multiup(driver)
-        return mirroredto_urls
+        multiup_links = self._multiup(driver)
+        return multiup_links

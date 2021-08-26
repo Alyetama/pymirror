@@ -85,6 +85,4 @@ def cli() -> argparse.Namespace:
                         '--version',
                         action='version',
                         version=f'%(prog)s {__version__}')
-
-    args = parser.parse_args()
-    return args
+    return parser.parse_args()

@@ -8,6 +8,7 @@ import re
 from pathlib import Path
 
 import loguru
+import psutil
 import selenium.common.exceptions
 from rich.console import Console
 
@@ -57,6 +58,23 @@ def load_data():
 def download_time(file: str) -> float:
     file_size = Path(file).stat().st_size / 1e+6
     return file_size / float(Config['main']['upload_speed'])
+
+
+def kill_firefox_zombies() -> list:
+    terminated = []
+    for p in psutil.process_iter():
+        if 'firefox-bin' in p.name():
+            parent = psutil.Process(p.ppid())
+            if parent.name() != 'geckodriver':
+                continue
+            for child in parent.children(recursive=True):
+                if 'firefox-bin' in child.name():
+                    try:
+                        child.terminate()
+                        terminated.append(child.pid)
+                    except psutil.AccessDenied:
+                        continue
+    return terminated
 
 
 console = Console()

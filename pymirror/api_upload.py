@@ -84,7 +84,10 @@ class APIUpload:
         parameter = self.data[server]['parameter']
         curl = f'curl {flags} "{parameter}{self.args.input}" {srv}'
         curl = shlex.split(curl)
-        out = subprocess.run(curl, stdout=subprocess.PIPE)
+        try:
+            out = subprocess.run(curl, stdout=subprocess.PIPE, check=True)
+        except subprocess.CalledProcessError:
+            return
         try:
             link = json.loads(out.stdout)
         except json.decoder.JSONDecodeError:
@@ -97,9 +100,11 @@ class APIUpload:
             link = link.split('\n')[1].replace('DL: ', '')
         return link
 
-    def api_uploads(self, responses: list) -> Optional[list]:
+    def api_uploads(self, responses: list = None) -> Optional[list]:
         times = []
         api_uploads_links = []
+        if responses is None:
+            responses = [True] * len(self.data)
         for n, ((k, _), res) in enumerate(zip(self.data.items(), responses)):
             if self.args.number and n == int(self.args.number):
                 break

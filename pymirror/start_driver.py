@@ -53,7 +53,8 @@ class StartDrive:
         try:
             driver = webdriver.Firefox(options=options,
                                        firefox_profile=profile,
-                                       service_log_path=os.path.devnull)
+                                       # service_log_path=os.path.devnull
+                                       )
         except WebDriverException:
             os.environ['WDM_LOG_LEVEL'] = '0'
             os.environ['WDM_PRINT_FIRST_LINE'] = 'False'

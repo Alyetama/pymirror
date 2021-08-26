@@ -6,6 +6,7 @@ from pathlib import Path
 
 from .cli import cli
 from .main import PyMirror
+from .helpers import kill_firefox_zombies
 
 
 def main():
@@ -25,3 +26,4 @@ if __name__ == '__main__':
         foo.unlink()
     else:
         main()
+    kill_firefox_zombies()

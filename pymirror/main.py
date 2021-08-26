@@ -77,7 +77,7 @@ class PyMirror:
         links = list(links_dict.values())
         style = self.args.style
         if style == 'list':
-            output = '\n'.join(links)
+            output = links
         elif style == 'markdown':
             output = '\n'.join(
                 [f'- [{name}]({link})' for name, link in zip(names, links)])
