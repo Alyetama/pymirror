@@ -1,4 +1,4 @@
-name: pymirror tests
+name: pymirror unittest
 
 on: [push]
 

@@ -1,6 +1,6 @@
 # PyMirror
 
-[![DeepSource](https://static.deepsource.io/deepsource-badge-light-mini.svg)](https://deepsource.io/gh/Alyetama/pymirror/?ref=repository-badge) [![PyPI](https://img.shields.io/pypi/v/pymirror)](https://pypi.org/project/pymirror/) ![PyPI - Downloads](https://img.shields.io/pypi/dm/pymirror) [![PEP8](https://img.shields.io/badge/code%20style-pep8-green.svg)](https://www.python.org/dev/peps/pep-0008/)
+[![DeepSource](https://static.deepsource.io/deepsource-badge-light-mini.svg)](https://deepsource.io/gh/Alyetama/pymirror/?ref=repository-badge) [![PyPI](https://img.shields.io/pypi/v/pymirror)](https://pypi.org/project/pymirror/) ![PyPI - Downloads](https://img.shields.io/pypi/dm/pymirror) [![PEP8](https://img.shields.io/badge/code%20style-pep8-green.svg)](https://www.python.org/dev/peps/pep-0008/) ![Unittest](https://github.com/Alyetama/pymirror/actions/workflows/python_tests.yaml/badge.svg)
 
 ## Requirements
 
