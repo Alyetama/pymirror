@@ -4,7 +4,10 @@
 
 ## Requirements
 
+- [Python>=3.7](https://www.python.org/downloads/)
+- [pip](https://pip.pypa.io/en/stable/getting-started/)
 - [Firefox Browser](https://www.mozilla.org/en-US/firefox/new/) (optional)
+- [Gecko Driver](https://github.com/mozilla/geckodriver/releases) (optional)
 
 ## Installation
 
