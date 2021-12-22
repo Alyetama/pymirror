@@ -9,6 +9,9 @@
 ## Installation
 
 ```bash
+git clone https://github.com/Alyetama/pymirror.git
+cd pymirror
+sh setup.sh
 pip install pymirror
 ```
 

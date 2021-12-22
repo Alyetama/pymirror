@@ -33,10 +33,10 @@ class _Config:
 
     def __call__(self) -> _MyConfigParser:
         if not Path(self.project_path).exists():
-            print('Detected first run...')
             shutil.copytree('data', f'{self.project_path}/data')
             Path(self.project_path).mkdir(exist_ok=True)
         if not Path(self.file_name).exists():
+            print('Detected first run...')
             print('Creating a config file...')
             config = self.create_config()
             config.write2(self.file_name)
