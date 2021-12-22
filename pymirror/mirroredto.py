@@ -9,6 +9,7 @@ from pathlib import Path
 
 from dracula import DraculaPalette as Dp
 from loguru import logger
+from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 
 from .config import Config
@@ -37,29 +38,28 @@ class Mirroredto:
                 time.sleep(2)
                 driver.get('https://www.mirrored.to/')
                 time.sleep(5)
-                html = driver.find_element_by_tag_name('html')
+                html = driver.find_element(By.TAG_NAME, 'html')
                 _ = [html.send_keys(Keys.ARROW_DOWN) for _ in range(3)]
 
                 for x in batch:
                     try:
                         if len(batch) > 8 and x == 'GoFileIo':
-                            driver.find_element_by_id(x.lower()).click()
+                            driver.find_element(By.ID, x.lower()).click()
                         elif more_links['mirroredto'][x]['limit'] \
                                 > file_size:
-                            driver.find_element_by_id(x.lower()).click()
+                            driver.find_element(By.ID, x.lower()).click()
                     except selenium_exceptions as e:
                         console.print(SeleniumExceptionInfo(e))
                         continue
 
                 time.sleep(2)
                 resolved_file = str(Path(self.args.input).resolve())
-                driver.find_element_by_css_selector(
-                    '#uploadifive-html_file_upload > '
-                    'input[type=file]:nth-child(3)'
-                ).send_keys(resolved_file)
+                driver.find_element(
+                    By.CSS_SELECTOR, '#uploadifive-html_file_upload > '
+                    'input[type=file]:nth-child(3)').send_keys(resolved_file)
                 time.sleep(1)
 
-                driver.find_element_by_id('upload_button').click()
+                driver.find_element(By.ID, 'upload_button').click()
                 time.sleep(5)
 
                 while True:
@@ -67,10 +67,10 @@ class Mirroredto:
                         time.sleep(1)
                         break
 
-                link = driver.find_element_by_class_name('mlink').text
+                link = driver.find_element(By.CLASS_NAME, 'mlink').text
                 driver.get(link)
                 time.sleep(2)
-                driver.find_element_by_class_name('secondary').click()
+                driver.find_element(By.CLASS_NAME, 'secondary').click()
                 time.sleep(2)
 
                 start = time.time()
@@ -78,13 +78,13 @@ class Mirroredto:
                 while True:
                     time.sleep(5)
                     status = [
-                        x.text for x in driver.find_elements_by_class_name(
-                            'id_Success')
+                        x.text for x in driver.find_elements(
+                            By.CLASS_NAME, 'id_Success')
                     ]
                     if len(status) >= 8 or time.time() - start > 60:
                         break
 
-                for x in driver.find_elements_by_class_name('get_btn'):
+                for x in driver.find_elements(By.CLASS_NAME, 'get_btn'):
                     try:
                         x.click()
                     except selenium_exceptions:
@@ -94,8 +94,8 @@ class Mirroredto:
                 for handle in driver.window_handles:
                     driver.switch_to.window(handle)
                     try:
-                        link = driver.find_element_by_class_name(
-                            'code_wrap').text
+                        link = driver.find_element(By.CLASS_NAME,
+                                                   'code_wrap').text
                         Shared.all_links.append(link)
                         mirroredto_links.append(link)
                         console.print(f'[[{Dp.g}] OK [/{Dp.g}]] {link}')

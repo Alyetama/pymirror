@@ -3,6 +3,7 @@
 
 import configparser
 import uuid
+import shutil
 from pathlib import Path
 
 # noinspection PyPackageRequirements
@@ -25,22 +26,25 @@ class _Dict(dict):
 
 
 class _Config:
-    def __init__(self, file_name: str = 'config.ini') -> None:
-        self.file_name = file_name
+    def __init__(self) -> None:
+        self.file_name = str(Path('~/.pymirror/config.ini').expanduser())
         self.config = _MyConfigParser(allow_no_value=True)
-        self.project_path = str(Path(__file__).parent)
+        self.project_path = str(Path('~/.pymirror').expanduser())
 
     def __call__(self) -> _MyConfigParser:
+        if not Path(self.project_path).exists():
+            print('Detected first run...')
+            shutil.copytree('data', f'{self.project_path}/data')
+            Path(self.project_path).mkdir(exist_ok=True)
         if not Path(self.file_name).exists():
             print('Creating a config file...')
             config = self.create_config()
             config.write2(self.file_name)
         else:
             config = self.read()
-        if (
-                config['main']['upload_speed'] == '' or
-                config['main']['uuid'] != str(uuid.getnode())  # noqa
-        ):
+        if (config['main']['upload_speed'] == ''
+                or config['main']['uuid'] != str(uuid.getnode())  # noqa
+            ):
             uspeed = self.upload_speed()
             config['main']['upload_speed'] = str(uspeed)
             config.write2(self.file_name)
@@ -57,7 +61,7 @@ class _Config:
         conf['project_path'] = self.project_path
         conf['ublock'] = f'{self.project_path}/.addons/ublock_latest.xpi'
         conf['data_path'] = f'{self.project_path}/data'
-        conf['log_file'] = 'pymirror.log'
+        conf['log_file'] = f'{self.project_path}/pymirror.log'
         conf['win_gecko'] = ''
         conf['uuid'] = str(uuid.getnode())
         conf['upload_speed'] = ''

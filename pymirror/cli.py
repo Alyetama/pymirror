@@ -24,7 +24,8 @@ def fmt(prog):
 
 def cli() -> argparse.Namespace:
     # noinspection PyTypeChecker
-    parser = argparse.ArgumentParser(prog='pymirror', formatter_class=fmt,
+    parser = argparse.ArgumentParser(prog='pymirror',
+                                     formatter_class=fmt,
                                      add_help=False)
     parser.add_argument('-h',
                         '--help',
@@ -63,12 +64,11 @@ def cli() -> argparse.Namespace:
         help='Check the status of the remote servers (default: False)',
         action='store_false',
         default=False)
-    parser.add_argument(
-        '-D',
-        '--debug',
-        help='Debug',
-        action='store_true',
-        default=False)
+    parser.add_argument('-D',
+                        '--debug',
+                        help='Debug',
+                        action='store_true',
+                        default=False)
     parser.add_argument(
         '-l',
         '--log',

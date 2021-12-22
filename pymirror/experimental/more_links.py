@@ -11,6 +11,7 @@ from pathlib import Path
 from typing import Optional
 
 from dracula import DraculaPalette as Dp
+from selenium.webdriver.common.by import By
 
 from ..helpers import Shared, console, selenium_exceptions
 from ..start_driver import StartDrive
@@ -34,13 +35,14 @@ class MoreLinks:
     def upload_to_all_(self):
         times = []
         links = []
-        sites = {k: v for k, v in MoreLinks(
-            self.args).getdict_().items() if not k.endswith('_')}
+        sites = {
+            k: v
+            for k, v in MoreLinks(self.args).getdict_().items()
+            if not k.endswith('_')
+        }
 
-        if (
-                self.args.number
-                and int(self.args.number) < len(Shared.all_links) + 5
-        ):
+        if (self.args.number
+                and int(self.args.number) < len(Shared.all_links) + 5):
             left = int(self.args.number) - len(Shared.all_links)
             sites = dict(itertools.islice(sites.items(), left))
 
@@ -59,8 +61,7 @@ class MoreLinks:
                 console.print(
                     f'[[{Dp.r}] ERROR! [/{Dp.r}]]',
                     f'Encountered error while attempting to upload to'
-                    f'[{Dp.b}]{name}[/{Dp.b}]'
-                )
+                    f'[{Dp.b}]{name}[/{Dp.b}]')
             finally:
                 signal.alarm(0)
         return links
@@ -71,12 +72,12 @@ class MoreLinks:
         driver = self.init_driver()
         driver.get('https://usaupload.com/register_non_user')
         time.sleep(2)
-        driver.find_element_by_id('add_files_btn').send_keys(self.file)
-        driver.find_element_by_class_name('upload-button').click()
+        driver.find_element(By.ID, 'add_files_btn').send_keys(self.file)
+        driver.find_element(By.CLASS_NAME, 'upload-button').click()
         while True:
             try:
-                link = driver.find_element_by_class_name(
-                    'col-xs-4').get_attribute('dtfullurl')
+                link = driver.find_element(
+                    By.CLASS_NAME, 'col-xs-4').get_attribute('dtfullurl')
                 if link:
                     driver.quit()
                     return link
@@ -89,19 +90,19 @@ class MoreLinks:
         driver = self.init_driver()
         driver.get('https://www.filesharego.com')
         time.sleep(2)
-        for e in driver.find_elements_by_class_name('nav-item'):
+        for e in driver.find_elements(By.CLASS_NAME, 'nav-item'):
             if 'Upload File' in e.text:
                 e.click()
                 break
         time.sleep(2)
-        driver.find_element_by_class_name('dz-hidden-input').send_keys(
-            self.file)
+        driver.find_element(By.CLASS_NAME,
+                            'dz-hidden-input').send_keys(self.file)
         while True:
             try:
-                link_id = driver.find_element_by_id('copy').get_attribute(
-                    'data-id')
-                link = driver.find_element_by_id(link_id).get_attribute(
-                    'value')
+                link_id = driver.find_element(By.ID,
+                                              'copy').get_attribute('data-id')
+                link = driver.find_element(By.ID,
+                                           link_id).get_attribute('value')
                 if link:
                     driver.quit()
                     return link
@@ -111,11 +112,12 @@ class MoreLinks:
     def filepizza(self) -> Optional[str]:
         driver = self.init_driver()
         driver.get('https://file.pizza/')
-        driver.find_element_by_css_selector(
+        driver.find_element(
+            By.CSS_SELECTOR,
             '.select-file-label > input:nth-child(1)').send_keys(self.file)
         while True:
             time.sleep(1)
-            link = driver.find_element_by_class_name('short-url').text
+            link = driver.find_element(By.CLASS_NAME, 'short-url').text
             if link:
                 driver.quit()
                 break
@@ -128,11 +130,12 @@ class MoreLinks:
         driver = self.init_driver()
         driver.get('https://expirebox.com/')
         time.sleep(2)
-        driver.find_element_by_id('fileupload').send_keys(self.file)
+        driver.find_element(By.ID, 'fileupload').send_keys(self.file)
         while True:
             time.sleep(1)
             try:
-                link = driver.find_element_by_css_selector(
+                link = driver.find_element(
+                    By.CSS_SELECTOR,
                     'div.input-group:nth-child(3) > input:nth-child(1)'
                 ).get_attribute('value')
                 if link:
@@ -151,7 +154,8 @@ class MoreLinks:
         while True:
             time.sleep(1)
             try:
-                e = driver.find_element_by_css_selector(
+                e = driver.find_element(
+                    By.CSS_SELECTOR,
                     'div.buttons:nth-child(3) > a:nth-child(1)')
                 link = e.get_attribute('href').split('&body=')[1]
                 if link:
@@ -162,12 +166,13 @@ class MoreLinks:
 
     def sendcm(self) -> str:
         driver = self.init_driver()
-        driver.find_element_by_id('file_0').send_keys(self.file)
-        up = driver.find_element_by_id('upload_controls')
-        up.find_element_by_class_name('btn').click()
+        driver.find_element(By.ID, 'file_0').send_keys(self.file)
+        up = driver.find_element(By.ID, 'upload_controls')
+        up.find_element(By.CLASS_NAME, 'btn').click()
         while True:
             try:
-                link = driver.find_element_by_css_selector(
+                link = driver.find_element(
+                    By.CSS_SELECTOR,
                     '.input-group > textarea:nth-child(2)').text
                 return link
             except selenium_exceptions:

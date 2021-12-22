@@ -53,10 +53,8 @@ class PyMirror:
             ips.append((ip, k))
         return ips
 
-    def style_output(
-            self,
-            links_list: Union[list, str] = None
-    ) -> Union[list, str]:
+    def style_output(self,
+                     links_list: Union[list, str] = None) -> Union[list, str]:
         if isinstance(links_list, str):
             links_list = [x for x in links_list.split('\n') if x != '']
         if links_list is None:
@@ -93,9 +91,8 @@ class PyMirror:
         signal.signal(signal.SIGINT, keyboardInterruptHandler)
 
         if self.args.experimental and not self.args.more_links:
-            raise Exception(
-                'You need to add the `--more-links` flag to use '
-                '`--experimental`')
+            raise Exception('You need to add the `--more-links` flag to use '
+                            '`--experimental`')
 
         with open(f'{Config.data_path}/servers_data.json') as j:
             data = json.load(j)

@@ -10,6 +10,7 @@ from pathlib import Path
 from typing import Union, Optional
 
 from dracula import DraculaPalette as Dp
+from selenium.webdriver.common.by import By
 
 from .config import Config
 from .helpers import Shared, console
@@ -42,8 +43,7 @@ class MultiUp:
             more_links = json.load(j)
 
         server = cURL_request(
-            'curl -s https://www.multiup.org/api/get-fastest-server'
-        )['server']
+            'curl -s https://www.multiup.org/api/get-fastest-server')['server']
         selected_hosts_lst = [
             'filerio.in', 'drop.download', 'download.gg', 'uppit.com',
             'uploadbox.io'
@@ -65,16 +65,14 @@ class MultiUp:
             s = ''
         else:
             s = 's'
-        selected_hosts = ' '.join(
-            [f'-F {x}=true' for x in selected_hosts_lst])
+        selected_hosts = ' '.join([f'-F {x}=true' for x in selected_hosts_lst])
         upload = cURL_request(
             f'curl -{s}F "files[]=@{self.args.input}" {selected_hosts}'
             f' {server}')
         if len(upload['files']) == 0:
             upload = cURL_request(f'curl -{s}F "files[]=@{self.args.input}" '
                                   f'{server}')
-        link = upload['files'][0]['url'].replace(
-            'download', 'en/mirror')
+        link = upload['files'][0]['url'].replace('download', 'en/mirror')
         driver.get(link)
 
         i = 0
@@ -87,7 +85,7 @@ class MultiUp:
             if es_len != len(elements):
                 j = 0
             driver.refresh()
-            elements = driver.find_elements_by_class_name('host')
+            elements = driver.find_elements(By.CLASS_NAME, 'host')
             es_len = len(elements)
             if es_len == 2:
                 i += 1

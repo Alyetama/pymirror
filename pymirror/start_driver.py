@@ -12,6 +12,7 @@ from typing import Any
 from dracula import DraculaPalette as Dp
 from selenium import webdriver
 from selenium.common.exceptions import WebDriverException
+from selenium.webdriver.common.by import By
 from selenium.webdriver.firefox.options import Options
 from webdriver_manager.firefox import GeckoDriverManager
 
@@ -30,8 +31,7 @@ class StartDrive:
         p = subprocess.Popen(
             shlex.split(f'curl -sLo "{Config.ublock}" {latest}'),
             stdout=subprocess.PIPE,
-            shell=False
-        )
+            shell=False)
         p.communicate()
         console.print(
             '\nYou\'re running the "--more-links" flag '
@@ -51,10 +51,11 @@ class StartDrive:
         if headless:
             options.headless = True
         try:
-            driver = webdriver.Firefox(options=options,
-                                       firefox_profile=profile,
-                                       # service_log_path=os.path.devnull
-                                       )
+            driver = webdriver.Firefox(
+                options=options,
+                firefox_profile=profile,
+                # service_log_path=os.path.devnull
+            )
         except WebDriverException:
             os.environ['WDM_LOG_LEVEL'] = '0'
             os.environ['WDM_PRINT_FIRST_LINE'] = 'False'
@@ -84,10 +85,10 @@ class StartDrive:
         driver.install_addon(Config.ublock, temporary=True)  # noqa
         time.sleep(1)
         driver.get('about:support')
-        body = driver.find_element_by_id('addons-tbody')
-        rows = body.find_elements_by_tag_name('tr')
+        body = driver.find_element(By.ID, 'addons-tbody')
+        rows = body.find_elements(By.TAG_NAME, 'tr')
         for row in rows:
-            cells = row.find_elements_by_tag_name('td')
+            cells = row.find_elements(By.TAG_NAME, 'td')
             for cell in cells:
                 if 'uBlock' in cell.text:
                     ublock_exists = True

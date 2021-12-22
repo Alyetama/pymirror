@@ -28,7 +28,7 @@ class PyMirrorTests(unittest.TestCase):
     def tearDown(self):
         self.foo.unlink()
         if Options.remove_config:
-            config_file = ['config.ini']
+            config_file = [str(Path('~/.pymirror/config.ini').expanduser())]
         else:
             config_file = []
         for file in ['geckodriver.log'] + config_file:

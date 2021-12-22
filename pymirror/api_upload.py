@@ -32,7 +32,8 @@ class APIUpload:
     def ping(ip: str) -> bool:
         def _ping(flag: str, _ip: str) -> int:
             out = subprocess.Popen(shlex.split(f'ping {flag} 1 {_ip}'),
-                                   stdout=subprocess.PIPE, shell=False)
+                                   stdout=subprocess.PIPE,
+                                   shell=False)
             out.communicate()
             return out.returncode
 
@@ -47,17 +48,14 @@ class APIUpload:
             return True
         console.print(
             f'[[{Dp.r}] ERROR! [/{Dp.r}]] [{Dp.c}]{ip[1]}[/{Dp.c}] is '
-            'down!'
-        )
+            'down!')
         logger.warning(f'{ip[1]} is offline!')
         return False
 
     def curl(self, server: str) -> Optional[str]:
         def find_value(key: str, d: dict) -> Generator[str, None, None]:
-            for k, v in (
-                    d.items() if type(d) is dict else
-                    enumerate(d) if type(d) is list else []
-            ):
+            for k, v in (d.items() if type(d) is dict else
+                         enumerate(d) if type(d) is list else []):
                 if k == key:
                     yield v
                 if type(v) in [dict, list]:
@@ -120,11 +118,8 @@ class APIUpload:
                 link = self.curl(k)
                 if not link:
                     continue
-                if (
-                        'bad gateway' in link.lower()
-                        or 'error' in link.lower()
-                        or 'https://' not in link.lower()
-                ):
+                if ('bad gateway' in link.lower() or 'error' in link.lower()
+                        or 'https://' not in link.lower()):
                     continue
                 console.print(f'[[{Dp.g}] OK [/{Dp.g}]]', link)
                 Shared.all_links.append(link)

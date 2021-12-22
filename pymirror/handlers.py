@@ -38,8 +38,7 @@ def keyboardInterruptHandler(*args) -> NoReturn:  # noqa
 
 
 def SeleniumExceptionInfo(exception: Exception) -> str:
-    tb = traceback.format_exception(None, exception,
-                                    exception.__traceback__)
+    tb = traceback.format_exception(None, exception, exception.__traceback__)
     tb = ''.join(tb).rstrip()
     logger.error(f'Selenium encountered an error:\n{tb}')
     return tb
@@ -50,8 +49,7 @@ def custom_error_traceback(exception: Exception,
                            log: bool = False) -> list:
     if log:
         logger.error(error_msg)
-    tb = traceback.format_exception(None, exception,
-                                    exception.__traceback__)
+    tb = traceback.format_exception(None, exception, exception.__traceback__)
     if log:
         logger.error(f'{"-" * 10} Start of error traceback {"-" * 10}')
         for ln in tb:
