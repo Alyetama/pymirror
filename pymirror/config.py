@@ -1,84 +1,43 @@
 #!/usr/bin/env python3
 # coding: utf-8
 
-import configparser
-import uuid
-import shutil
+import json
+import requests
+import sys
 from pathlib import Path
 
-# noinspection PyPackageRequirements
 import speedtest
 
 
-class _MyConfigParser(configparser.ConfigParser):
-    def __init__(self, *args, **kwargs) -> None:
-        super(_MyConfigParser, self).__init__(*args, **kwargs)
+def config():
+    home = Path.home()
+    CONFIG_DIR = f'{home}/.pymirror/.config'
+    if not Path(CONFIG_DIR).exists() or '--refresh-config' in sys.argv:
+        print('Configuring pymirror...')
+        Path(f'{CONFIG_DIR}/.addons').mkdir(exist_ok=True, parents=True)
+        Path(f'{CONFIG_DIR}/data').mkdir(exist_ok=True, parents=True)
 
-    def write2(self, file_name) -> None:
-        with open(file_name, 'w') as cf:
-            self.write(cf)
+        cfg = {
+            'project_path': CONFIG_DIR,
+            'ublock': f'{CONFIG_DIR}/.addons/ublock_latest.xpi',
+            'data_path': f'{CONFIG_DIR}/data',
+            'log_file': f'{CONFIG_DIR}/pymirror.log',
+            'win_gecko': None,
+            'upload_speed': speedtest.Speedtest().upload() / 8e+6
+        }
 
+        with open(f'{CONFIG_DIR}/.config', 'w') as j:
+            json.dump(cfg, j, indent=4)
 
-class _Dict(dict):
-    def __init__(self, *args, **kwargs) -> None:
-        super(_Dict, self).__init__(*args, **kwargs)
-        self.__dict__ = self
+        with open(f'{CONFIG_DIR}/data/more_links.json', 'w') as j:
+            r = requests.get('https://raw.githubusercontent.com/Alyetama/pymirror/main/pymirror/data/more_links.json')  # noqa E501
+            j.write(r.text)
 
+        with open(f'{CONFIG_DIR}/data/servers_data.json', 'w') as j:
+            r = requests.get('https://raw.githubusercontent.com/Alyetama/pymirror/main/pymirror/data/servers_data.json')  # noqa E501
+            j.write(r.text)
 
-class _Config:
-    def __init__(self) -> None:
-        self.file_name = str(Path('~/.pymirror/config.ini').expanduser())
-        self.config = _MyConfigParser(allow_no_value=True)
-        self.project_path = str(Path('~/.pymirror').expanduser())
-
-    def __call__(self) -> _MyConfigParser:
-        if not Path(self.project_path).exists():
-            Path(self.project_path).mkdir(exist_ok=True)
-            shutil.copytree(f'{Path(__file__).parent}/data', f'{self.project_path}/data')
-        if not Path(self.file_name).exists():
-            print('Detected first run...')
-            print('Creating a config file...')
-            config = self.create_config()
-            config.write2(self.file_name)
-        else:
-            config = self.read()
-        if (config['main']['upload_speed'] == ''
-                or config['main']['uuid'] != str(uuid.getnode())  # noqa
-            ):
-            uspeed = self.upload_speed()
-            config['main']['upload_speed'] = str(uspeed)
-            config.write2(self.file_name)
-        return config
-
-    def read(self):
-        conf = self.config
-        conf.read(self.file_name)
-        return conf
-
-    def create_config(self) -> _MyConfigParser:
-        self.config.add_section('main')
-        conf = self.config['main']
-        conf['project_path'] = self.project_path
-        conf['ublock'] = f'{self.project_path}/.addons/ublock_latest.xpi'
-        conf['data_path'] = f'{self.project_path}/data'
-        conf['log_file'] = f'{self.project_path}/pymirror.log'
-        conf['win_gecko'] = ''
-        conf['uuid'] = str(uuid.getnode())
-        conf['upload_speed'] = ''
-        return self.config
-
-    def get_dict(self) -> _Dict:
-        self.config.read(self.file_name)
-        config_dict = dict(self.config['main'].items())
-        return _Dict(config_dict)
-
-    @staticmethod
-    def upload_speed():
-        st = speedtest.Speedtest()
-        speed = st.upload()
-        return speed / 8e+6
-
-
-_Config().__call__()
-_config = _Config().get_dict()
-Config = _config
+    else:
+        with open(f'{CONFIG_DIR}/.config') as j:
+            cfg = json.load(j)
+    return cfg

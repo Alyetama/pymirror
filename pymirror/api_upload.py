@@ -15,8 +15,8 @@ from typing import Optional, Generator
 
 from dracula import DraculaPalette as Dp
 
-from .handlers import custom_error_traceback
-from .helpers import Shared, logger, console
+from pymirror.handlers import custom_error_traceback
+from pymirror.helpers import Shared, logger, console
 
 
 class Error(Exception):

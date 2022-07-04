@@ -3,7 +3,7 @@
 
 import argparse
 
-from .__init__ import __version__
+from pymirror.__version__ import __version__
 
 
 class CustomHelpFormatter(argparse.HelpFormatter):

@@ -17,19 +17,20 @@ from typing import Union, NoReturn
 from dracula import DraculaPalette as Dp
 from rich.panel import Panel
 
-from .api_upload import APIUpload
-from .config import Config
-from .experimental.more_links import MoreLinks
-from .handlers import keyboardInterruptHandler
-from .helpers import Shared, console, logger, load_data
-from .mirroredto import Mirroredto
-from .multiup import MultiUp
+from pymirror.api_upload import APIUpload
+from pymirror.config import config
+from pymirror.experimental.more_links import MoreLinks
+from pymirror.handlers import keyboardInterruptHandler
+from pymirror.helpers import Shared, console, logger, load_data
+from pymirror.mirroredto import Mirroredto
+from pymirror.multiup import MultiUp
 
 
 class PyMirror:
     def __init__(self, args: argparse.Namespace) -> None:
         self.args = args
         self.data = load_data()
+        self.config = config()
 
     @staticmethod
     def initializer() -> NoReturn:
@@ -94,12 +95,12 @@ class PyMirror:
             raise Exception('You need to add the `--more-links` flag to use '
                             '`--experimental`')
 
-        with open(f'{Config.data_path}/servers_data.json') as j:
+        with open(f'{self.config["data_path"]}/servers_data.json') as j:
             data = json.load(j)
 
         if self.args.log:
             logger.remove()
-            logger.add(Config.log_file, level='DEBUG')
+            logger.add(self.config['log_file'], level='DEBUG')
             logger.add(sys.stderr, level='ERROR')
 
         console.print('Press `CTRL+C` at any time to quit.', style='#f1fa8c')

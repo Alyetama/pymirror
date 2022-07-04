@@ -12,14 +12,15 @@ from typing import Union, Optional
 from dracula import DraculaPalette as Dp
 from selenium.webdriver.common.by import By
 
-from .config import Config
-from .helpers import Shared, console
-from .start_driver import StartDrive
+from pymirror.config import config
+from pymirror.helpers import Shared, console
+from pymirror.start_driver import StartDrive
 
 
 class MultiUp:
     def __init__(self, args: argparse.Namespace):
         self.args = args
+        self.config = config()
 
     def _multiup(self, driver) -> Optional[list]:
         def cURL_request(url: str) -> Union[None, dict]:
@@ -39,7 +40,7 @@ class MultiUp:
 
         multiup_links = []
 
-        with open(f'{Config.data_path}/more_links.json') as j:
+        with open(f'{self.config["data_path"]}/more_links.json') as j:
             more_links = json.load(j)
 
         server = cURL_request(

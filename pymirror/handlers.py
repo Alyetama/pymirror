@@ -9,7 +9,7 @@ from typing import NoReturn
 import psutil
 from dracula import DraculaPalette as Dp
 
-from .helpers import console, logger, Shared
+from pymirror.helpers import console, logger, Shared
 
 
 def firefoxInterrupt(pids) -> list:

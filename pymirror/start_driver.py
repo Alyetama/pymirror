@@ -16,20 +16,20 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.firefox.options import Options
 from webdriver_manager.firefox import GeckoDriverManager
 
-from .config import Config
-from .helpers import Shared, console, selenium_exceptions
+from pymirror.config import config
+from pymirror.helpers import Shared, console, selenium_exceptions
 
 
 class StartDrive:
     def __init__(self, cur_module: Any = None) -> None:
         self.cur_module = cur_module
+        self.config = config()
 
-    @staticmethod
-    def download_ublock() -> None:
-        Path(Path(Config.ublock).parent).mkdir(exist_ok=True)
+    def download_ublock(self) -> None:
+        Path(Path(self.config['ublock']).parent).mkdir(exist_ok=True)
         latest = 'https://addons.mozilla.org/firefox/downloads/file/3806442'
         p = subprocess.Popen(
-            shlex.split(f'curl -sLo "{Config.ublock}" {latest}'),
+            shlex.split(f'curl -sLo \"{self.config["ublock"]}\" {latest}'),
             stdout=subprocess.PIPE,
             shell=False)
         p.communicate()
@@ -38,11 +38,11 @@ class StartDrive:
             'for the first time. Please wait until everything is ready. '
             'This is a one-time thing.\n',
             style='#f1fa8c')
-        if not Path(Config.ublock).exists():
+        if not Path(self.config['ublock']).exists():
             raise AssertionError
 
     def start_driver(self, headless: bool = True):
-        if not Path(Config.ublock).exists():
+        if not Path(self.config['ublock']).exists():
             self.download_ublock()
 
         options = Options()
@@ -82,7 +82,7 @@ class StartDrive:
             raise se
 
         ublock_exists = False
-        driver.install_addon(Config.ublock, temporary=True)  # noqa
+        driver.install_addon(config['ublock'], temporary=True)  # noqa
         time.sleep(1)
         driver.get('about:support')
         body = driver.find_element(By.ID, 'addons-tbody')
