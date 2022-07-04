@@ -1,6 +1,6 @@
 # PyMirror
 
-[![PyPI](https://img.shields.io/pypi/v/pymirror)](https://pypi.org/project/pymirror/) [![PyPI - Downloads](https://img.shields.io/pypi/dm/pymirror)] [![PEP8](https://img.shields.io/badge/code%20style-pep8-green.svg)](https://www.python.org/dev/peps/pep-0008/) [![pymirror unittest](https://github.com/Alyetama/pymirror/actions/workflows/unittest.yaml/badge.svg)](https://github.com/Alyetama/pymirror/actions/workflows/unittest.yaml)
+[![Build](https://github.com/Alyetama/pymirror/actions/workflows/poetry-build.yml/badge.svg)](https://github.com/Alyetama/pymirror/actions/workflows/poetry-build.yml) [![PyPI](https://img.shields.io/pypi/v/pymirror)](https://pypi.org/project/pymirror/) ![PyPI - Downloads](https://img.shields.io/pypi/dm/pymirror) [![PEP8](https://img.shields.io/badge/code%20style-pep8-green.svg)](https://www.python.org/dev/peps/pep-0008/)
 
 ## Requirements
 
