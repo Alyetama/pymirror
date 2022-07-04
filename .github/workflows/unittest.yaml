@@ -1,6 +1,7 @@
 name: pymirror unittest
 
 on:
+  push:
   release:
     types: [published, created]
 
