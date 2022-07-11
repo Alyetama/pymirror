@@ -13,17 +13,18 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 
 from pymirror.config import config
-from pymirror.handlers import SeleniumExceptionInfo
 from pymirror.helpers import Shared, console, logger, selenium_exceptions
 from pymirror.start_driver import StartDrive
 
 
 class Mirroredto:
+
     def __init__(self, args: argparse.Namespace):
         self.args = args
         self.config = config()
 
     def _mirroredto(self, drivers: list) -> list:
+
         def process(driver, batch):
             file_size = Path(self.args.input).stat().st_size / 1e+6
             with open(f'{self.config["data_path"]}/more_links.json') as j:
@@ -50,7 +51,7 @@ class Mirroredto:
                                 > file_size:
                             driver.find_element(By.ID, x.lower()).click()
                     except selenium_exceptions as e:
-                        console.print(SeleniumExceptionInfo(e))
+                        # console.print(SeleniumExceptionInfo(e))
                         continue
 
                 time.sleep(2)

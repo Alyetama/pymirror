@@ -21,6 +21,7 @@ from pymirror.helpers import Shared, console, selenium_exceptions
 
 
 class StartDrive:
+
     def __init__(self, cur_module: Any = None) -> None:
         self.cur_module = cur_module
         self.config = config()
@@ -82,7 +83,7 @@ class StartDrive:
             raise se
 
         ublock_exists = False
-        driver.install_addon(config['ublock'], temporary=True)  # noqa
+        driver.install_addon(self.config['ublock'], temporary=True)  # noqa
         time.sleep(1)
         driver.get('about:support')
         body = driver.find_element(By.ID, 'addons-tbody')

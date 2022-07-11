@@ -24,12 +24,14 @@ class Error(Exception):
 
 
 class APIUpload:
+
     def __init__(self, data: dict, args: argparse.Namespace) -> None:
         self.data = data
         self.args = args
 
     @staticmethod
     def ping(ip: str) -> bool:
+
         def _ping(flag: str, _ip: str) -> int:
             out = subprocess.Popen(shlex.split(f'ping {flag} 1 {_ip}'),
                                    stdout=subprocess.PIPE,
@@ -53,6 +55,7 @@ class APIUpload:
         return False
 
     def curl(self, server: str) -> Optional[str]:
+
         def find_value(key: str, d: dict) -> Generator[str, None, None]:
             for k, v in (d.items() if type(d) is dict else
                          enumerate(d) if type(d) is list else []):

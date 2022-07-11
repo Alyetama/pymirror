@@ -30,11 +30,15 @@ def config():
             json.dump(cfg, j, indent=4)
 
         with open(f'{CONFIG_DIR}/data/more_links.json', 'w') as j:
-            r = requests.get('https://raw.githubusercontent.com/Alyetama/pymirror/main/pymirror/data/more_links.json')  # noqa E501
+            r = requests.get(
+                'https://raw.githubusercontent.com/Alyetama/pymirror/main/pymirror/data/more_links.json'
+            )  # noqa E501
             j.write(r.text)
 
         with open(f'{CONFIG_DIR}/data/servers_data.json', 'w') as j:
-            r = requests.get('https://raw.githubusercontent.com/Alyetama/pymirror/main/pymirror/data/servers_data.json')  # noqa E501
+            r = requests.get(
+                'https://raw.githubusercontent.com/Alyetama/pymirror/main/pymirror/data/servers_data.json'
+            )  # noqa E501
             j.write(r.text)
 
     else:

@@ -27,6 +27,7 @@ from pymirror.multiup import MultiUp
 
 
 class PyMirror:
+
     def __init__(self, args: argparse.Namespace) -> None:
         self.args = args
         self.data = load_data()

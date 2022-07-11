@@ -7,6 +7,7 @@ from pymirror.__version__ import __version__
 
 
 class CustomHelpFormatter(argparse.HelpFormatter):
+
     def __init__(self, prog):
         super().__init__(prog, max_help_position=40, width=80)
 
@@ -41,46 +42,41 @@ def cli() -> argparse.Namespace:
                         help='Output style (default: lines)',
                         choices=['lines', 'list', 'markdown', 'reddit'],
                         default='lines')
-    parser.add_argument(
-        '-m',
-        '--more-links',
-        help='Use mirrored.to to generate more likes (default: False)',
-        action='store_true',
-        default=False)
+    parser.add_argument('-m',
+                        '--more-links',
+                        help='Use mirrored.to to generate more likes',
+                        action='store_true',
+                        default=False)
     parser.add_argument(
         '-n',
         '--number',
         help='Select a specific number of servers to use (default: max)',
         default=None)
-    parser.add_argument(
-        '-d',
-        '--delete',
-        help='Delete the file after the process is complete (default: False)',
-        action='store_true',
-        default=False)
-    parser.add_argument(
-        '-c',
-        '--check-status',
-        help='Check the status of the remote servers (default: False)',
-        action='store_false',
-        default=False)
-    parser.add_argument('-D',
-                        '--debug',
-                        help='Debug',
+    parser.add_argument('-d',
+                        '--delete',
+                        help='Delete the file after the process is complete',
                         action='store_true',
                         default=False)
-    parser.add_argument(
-        '-l',
-        '--log',
-        help='Show logs and save it to a file (default: False)',
-        action='store_true',
-        default=False)
-    parser.add_argument(
-        '-e',
-        '--experimental',
-        help='Generate even more links (experimental) (default: False)',
-        action='store_true',
-        default=False)
+    parser.add_argument('-c',
+                        '--check-status',
+                        help='Check the status of the remote servers',
+                        action='store_false',
+                        default=False)
+    parser.add_argument('-D',
+                        '--debug',
+                        help='Debug mode',
+                        action='store_true',
+                        default=False)
+    parser.add_argument('-l',
+                        '--log',
+                        help='Show logs and save it to a file',
+                        action='store_true',
+                        default=False)
+    parser.add_argument('-e',
+                        '--experimental',
+                        help='Generate even more links (unstable)',
+                        action='store_true',
+                        default=False)
     parser.add_argument('-v',
                         '--version',
                         action='version',

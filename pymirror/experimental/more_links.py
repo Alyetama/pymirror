@@ -18,6 +18,7 @@ from ..start_driver import StartDrive
 
 
 class MoreLinks:
+
     def __init__(self, args: argparse.Namespace) -> None:
         self.args = args
         self.methods = inspect.getmembers(self, predicate=inspect.ismethod)[1:]
@@ -149,8 +150,9 @@ class MoreLinks:
             return
         driver = self.init_driver()
         driver.get('https://filepost.io/')
-        driver.find_element_by_css_selector(
-            '.drop-region > input:nth-child(4)').send_keys(self.file)
+        driver.find_element(By.CSS_SELECTOR,
+                            '.drop-region > input:nth-child(4)').send_keys(
+                                self.file)
         while True:
             time.sleep(1)
             try:

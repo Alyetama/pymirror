@@ -18,11 +18,13 @@ from pymirror.start_driver import StartDrive
 
 
 class MultiUp:
+
     def __init__(self, args: argparse.Namespace):
         self.args = args
         self.config = config()
 
     def _multiup(self, driver) -> Optional[list]:
+
         def cURL_request(url: str) -> Union[None, dict]:
             curl = shlex.split(url)
             try:

@@ -19,6 +19,7 @@ class Options:
 
 
 class PyMirrorTests(unittest.TestCase):
+
     def setUp(self):
         self.foo = Path('foo.txt')
         if not self.foo.exists():
