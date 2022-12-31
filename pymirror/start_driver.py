@@ -10,6 +10,7 @@ from pathlib import Path
 from typing import Any
 
 from dracula import DraculaPalette as Dp
+from loguru import logger
 from selenium import webdriver
 from selenium.common.exceptions import WebDriverException
 from selenium.webdriver.common.by import By
@@ -94,7 +95,7 @@ class StartDrive:
                 if 'uBlock' in cell.text:
                     ublock_exists = True
         if not ublock_exists:
-            raise AssertionError
+            logger.warning('Could not find uBlock. Will attempt to continue...')
 
         capabilities = driver.capabilities
         pid = capabilities['moz:processID']
